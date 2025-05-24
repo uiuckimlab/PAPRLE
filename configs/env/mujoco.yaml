@@ -1,0 +1,3 @@
+type: mujoco
+name: mujoco
+use_moveit_to_initialize: false

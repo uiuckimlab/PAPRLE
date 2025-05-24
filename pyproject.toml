@@ -1,0 +1,38 @@
+[project]
+name = "paprle"
+version = "0.1.0"
+description = "PAPRLE: Plug-and-Play Robotic Limb Environment"
+authors = [
+  { name="Obin Kwon", email="obin.kwon000@gmail.com" }
+]
+readme = "ReadMe.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+dependencies = [
+  "numpy",
+  "omegaconf",
+  "opencv-python",
+  "matplotlib",
+  "pytransform3d",
+  "yourdfpy",
+  "pyglet<2",
+  # Needed for keyboard control
+  "termcolor",
+  "getch",
+  "joblib",
+  "seaborn",
+  # Needed for mujoco visualization
+  "mujoco==3.1.6",
+  "mujoco_python_viewer==0.1.4",
+   #"sim_web_visualizer",
+]
+
+[project.optional-dependencies]
+mujoco = [
+  "mujoco==3.1.4",
+  "dm-control"
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
