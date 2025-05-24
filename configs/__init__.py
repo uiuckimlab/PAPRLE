@@ -2,7 +2,7 @@ import argparse
 from argparse import RawTextHelpFormatter
 import os
 from omegaconf import OmegaConf
-from paprle.utils.config_utils import add_info_robot_config, sanity_check_leader_config
+from paprle.utils.config_utils import add_info_robot_config, sanity_check_leader_config, change_working_directory
 
 def str2bool(v):
     if isinstance(v, bool): return v
@@ -12,19 +12,19 @@ def str2bool(v):
 
 class BaseConfig:
     def __init__(self):
-        # Change working directory to the root of the project
-        is_root_dir = 'configs' in os.listdir()
-        if not is_root_dir:
-            os.chdir(os.path.dirname(os.path.abspath(__file__)) + "/../")
+        change_working_directory()
 
     def parse(self, verbose=True):
         parser = argparse.ArgumentParser(add_help=False, formatter_class=RawTextHelpFormatter)
         parser.add_argument('--follower','-f', type=str, default='papras_6dof')
-        parser.add_argument('--leader', '-l', type=str, default='keyboard')
+        parser.add_argument('--leader', '-l', type=str, default='sliders')
         parser.add_argument('--env', '-e', type=str, default='mujoco')
 
         parser.add_argument('--render-teleop', action='store_true', default=False)
         parser.add_argument('--render-env', action='store_true', default=False)
+
+        parser.add_argument('--off-collision', type=str2bool, default=False)
+        parser.add_argument('--off-feedback', type=str2bool, default=False)
 
         # Help
         parser.add_argument('--help', action='help',
@@ -65,6 +65,12 @@ class BaseConfig:
         override_config = OmegaConf.load(f'configs/env/{args.env}.yaml')
         cli_config = OmegaConf.from_dotlist(unknown)
         self.env_config = OmegaConf.merge(override_config, cli_config)
+
+        # add additional config
+        self.env_config.render_teleop = args.render_teleop
+        self.env_config.render_env = args.render_env
+        self.env_config.off_collision = args.off_collision
+        self.env_config.off_feedback = args.off_feedback
 
         return self.follower_config, self.leader_config, self.env_config
 

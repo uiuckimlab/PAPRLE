@@ -1,4 +1,5 @@
-## Environment Setup
+
+## Installation
 **Recommended Environment**
 - Ubuntu 20.04 or Ubuntu 22.04
 - python 3.8 or 3.10
@@ -26,3 +27,11 @@ conda activate <env_name>
 ```bash
 pip install -e .
 ```
+
+
+
+## Simulator
+#### Isaacgym
+- [Download IsaacGym](https://developer.nvidia.com/isaac-gym)
+- Recommended python version is python 3.8, but still you can install with python 3.10
+  - Just comment "python_requires='>=3.6,<3.9'," in line 42 of setup.py (isaacgym/python/setup.py)

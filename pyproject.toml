@@ -9,13 +9,14 @@ readme = "ReadMe.md"
 license = { text = "MIT" }
 requires-python = ">=3.8"
 dependencies = [
-  "numpy",
+  "numpy==1.23",
   "omegaconf",
   "opencv-python",
   "matplotlib",
   "pytransform3d",
   "yourdfpy",
   "pyglet<2",
+  "tk",
   # Needed for keyboard control
   "termcolor",
   "getch",

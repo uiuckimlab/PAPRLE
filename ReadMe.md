@@ -5,49 +5,37 @@
 - [Usage](#usage)
 
 ## Overview
-This repository provides a teleoperation system for diverse robots (mainly for PAPRAS).
+This repository provides a teleoperation system for diverse robot configurations.
 The system is built with the goal of providing a plug-and-play experience, enabling users to quickly set up and use different robotic limbs in various environments.
-So you can find how to setup the new robot configuration with PAPRAS, and how to control the robot with different controllers.
-You can check which controllers, robots, and envs are supported in the following section.
-
 ![concept](docs/media/paprle_concept_comp.gif)
 
 ## Supported Environment
 - [x] Mujoco
-- [x] Isaacgym
-- [x] ROS1 (Gazebo or Hardware)
-- [x] ROS2 (Gazebo or Hardware)
+- [ ] Isaacgym
+- [ ] ROS1 (Gazebo or Hardware)
+- [ ] ROS2 (Gazebo or Hardware)
 
-## Supported Robots
-- Gallery
+## Supported Robots (Follower)
+- Using [PAPRAS](https://uiuckimlab.github.io/papras-pages), we can build various configurations of robotic arms. 
+PAPRLE is designed to support such diverse configurations, and below are the configurations we have tested so far:
+  - [ ] `papras_6dof` : One-arm 6-DOF PAPRAS
+  - [ ] `papras_7dof` : One-arm 7-DOF PAPRAS
+  - [ ] `papras_6dof_2arm_table` : Dual-arm 6-DOF PAPRAS on Table
+  - [ ] `papras_7dof_2arm_table` : Dual-arm 7-DOF PAPRAS on Table
+  - [ ] `papras_orthrus` : Dual-arm 7-DOF PAPRAS on Spot (Orthrus)
+  - [ ] `papras_stand` : Dual-arm 7-DOF PAPRAS on Stand
+  PAPRAS is a fully open-source robotic arm, and you can find the CAD files and other detailed information on the site.
+For more information about PAPRAS, please visit [this site](https://uiuckimlab.github.io/papras-pages). 
+- Also, PAPRLE has been tested with other robots on Mujoco and IsaacGym.
+  - [ ] `G1` : Unitree G1 - This is also tested with Hardware.
+  - [ ] `H1` : Unitree H1
+  - [ ] `UR5` : UR5
+  - [ ] `OpenManipulator-Y` : OpenManipulator-Y from Robotis - This is also tested with Hardware.
 
 
-## Installation
-**Recommended Environment**
-- Ubuntu 20.04 or Ubuntu 22.04
-- python 3.8 or 3.10
-
-**1. Clone the repository**
-
-```bash
-git clone https://github.com/uiuckimlab/PAPRLE.git
-```
-
-**2. Create a virtual environment or use conda**
-```bash
-# Create a virtual environment
-virtualenv <env_name> -p python3.8
-virutalenv <env_name>/bin/activate
-```
-or
-```bash
-# Create a conda environment
-conda create -n <env_name> python=3.8 # or python=3.10
-conda activate <env_name>
-```
-
-**3. Install**
-```bash
-pip install -e .
-```
-
+## Supported Devices (Leader)
+- [ ] Keyboard
+- [ ] Puppeteer
+- [ ] VisionPro
+- [ ] Joycon
+- [ ] PS5 DualSense

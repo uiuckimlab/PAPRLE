@@ -1,36 +1,33 @@
 mesh_dir: 'models/' # Default directory for meshes
 robot_cfg:
-  name: papras_6dof
+  name: papras_7dof
   asset_cfg:
     asset_dir: ${mesh_dir} # Directory for assets
-    urdf_path: 'models/papras_6dof/papras_6dof.urdf' # Path to the URDF file
-    xml_path: 'models/papras_6dof/papras_6dof.xml' # If you have xml file, specify the path here or just use urdf file here as well
-
+    urdf_path: 'models/papras_7dof/papras_7dof.urdf' # Path to the URDF file
+    xml_path: 'models/papras_7dof/papras_7dof.xml' # If you have xml file, specify the path here or just use urdf file here as well
   ignore_collision_pairs: []
-  control_dt: 0.008 # Control loop frequency - 125Hz for PAPRAS
-  teleop_dt: 0.02
+  control_dt: 0.02 # Control loop frequency - if we are using joint trajectory controller, it is enough
   eef_type: 'parallel_gripper' # Type of end effector: 'hand', 'power_gripper', 'parallel_gripper'
-  max_joint_vel: 20.0 # Maximum joint velocity
-
   limb_joint_names:
-    robot1: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6']
+    robot1: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6','robot1/joint7']
   hand_joint_names: # hand names
     robot1: ['robot1/gripper']
-  end_effector_link: # for IK
+  max_joint_vel: 2.0 # Maximum joint velocity
+  end_effector_link:
     robot1: 'robot1/end_effector_link'
-
   named_poses:
     #TODO: maybe read this info from srdf file, but conditionally. If not found, use this info
-    init: [0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0]
-
+    init: [0.0, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0]
   viewer_args:
     mujoco:
-      azimuth: 26.675000000000097
+#      azimuth: 26.675000000000097
+#      distance: 1.5335979275831788
+#      elevation: -20.22500000000002
+#      lookat: [ -0.20412881,  0.01636384,  0.28888699 ]
+      azimuth: 52.325000000000145
       distance: 1.5335979275831788
-      elevation: -20.22500000000002
-      lookat: [ -0.20412881,  0.01636384,  0.28888699 ]
-      viewer_width: 1200
-      viewer_height: 800
+      elevation: -12.125000000000004
+      lookat: [-0.20412881,  0.01636384,  0.28888699]
     sapien:
       width: 1510
       height: 768
@@ -43,19 +40,16 @@ robot_cfg:
     isaacgym:
       cam_pos: [1.41, -0.36, 0.58]
       cam_target: [0.45, -0.23, 0.31]
-    trimesh:
-      pq: [1.51597506, 1.04149913, 0.88220541, 0.34222756, 0.24566453, 0.50989899, 0.75002151]
-
 ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
   # the number of arms in the urdf file, the name of the robot does not matter, but order matters.
   robot1:
     # chain of joint names from base to end effector in ik_model
-    joint_names: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6']
+    joint_names: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6', 'robot1/joint7']
     ee_link: robot1/end_effector_link
-    dt: 0.05
+    dt: 0.1
     asset_dir: ${mesh_dir} # Directory for assets
-    urdf_path: 'models/papras_6dof/papras_6dof.urdf'
-    ik_damping: 0.075
-    eps: 1e-3
+    urdf_path: 'models/papras_7dof/papras_7dof.urdf'
+    ik_damping: 0.05
+    eps: 1e-2
     base_link: robot1/link1 # base_link in the original urdf file,not the base_link in the ik model
 

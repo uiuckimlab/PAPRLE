@@ -166,7 +166,7 @@ class MuJoCoParserClass(object):
                       VIS_TRANSPARENT=None,VIS_CONTACTPOINT=None,
                       contactwidth=None,contactheight=None,contactrgba=None,
                       VIS_JOINT=None,jointlength=None,jointwidth=None,jointrgba=None,
-                      CALL_MUJOCO_FUNC=True):
+                      CALL_MUJOCO_FUNC=True, **kwargs):
         """
             Initialize viewer
         """

@@ -1,3 +1,13 @@
+import os
+def change_working_directory():
+    """
+    Change working directory to the root of the project
+    """
+    is_root_dir = '.PROJECT_ROOT' in os.listdir()
+    if not is_root_dir:
+        os.chdir(os.path.dirname(os.path.abspath(__file__)) + "/../../")
+        print(f"Changed working directory to {os.getcwd()}")
+
 def add_info_robot_config(robot_config, verbose=True):
     """
     Add additional information to robot_config
@@ -57,7 +67,7 @@ def sanity_check_leader_config(leader_config, robot_config, verbose=True):
 
     robot_name = robot_config.robot_cfg.name
 
-    if 'gello' in leader_config.type:
+    if 'puppeteer' in leader_config.type:
         if len(leader_config.direct_mapping) == 0:
             leader_config.direct_mapping = {}
             for leader_limb_name in leader_config.limb_joint_names.keys():

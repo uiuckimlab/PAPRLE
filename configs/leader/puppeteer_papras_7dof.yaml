@@ -1,0 +1,47 @@
+type: puppeteer
+name: puppeteer_papras_7dof
+
+teleop_dt: 0.02
+output_type: joint_pos # 'joint_pos' or 'delta_eef_pose'
+
+# for eef-based mapping
+motion_scale: 1.0
+
+# for ROS-based controller
+leader_subscribe_topic: '/leaders/joint_states'
+limb_joint_names:
+  robot1: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6','robot1/joint7']
+
+end_effector_link:
+  robot1: 'robot1/end_effector_link'
+
+hand_joint_names:
+  robot1: ['robot1/gripper']
+
+named_poses:
+  #TODO: maybe read this info from srdf file, but conditionally. If not found, use this info
+  init: [0.0, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0]
+
+# leader limb -> follower limb
+direct_mapping: # default is empty, which means 1:1 mapping
+  robot1: 'robot1'
+
+
+reset_pose: [[-0.153, -0.016, 0.374]]
+reset_cube: [0.200, 0.100, 0.050]
+
+
+# for gello
+asset_cfg:
+  asset_dir: 'models/'
+  urdf_path: 'models/leaders/papras_7dof_leader.urdf'
+  xml_path: 'models/leaders/papras_7dof_leader.xml'
+
+direct_mapping_available_robots: ['papras_7dof']
+hand_limits: # for gripper range mapping
+  robot1/gripper: [-2.0, -1.0] #[-0.39, 0.56]
+
+render_base: 'trimesh'
+viewer_args:
+    trimesh:
+      pq: [1.51597506, 1.04149913, 0.88220541, 0.34222756, 0.24566453, 0.50989899, 0.75002151]

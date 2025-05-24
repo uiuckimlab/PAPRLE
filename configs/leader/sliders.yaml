@@ -1,0 +1,8 @@
+type: sliders
+name: sliders
+
+teleop_dt: 0.02
+output_type: joint_pos # 'joint_pos' or 'eef_pose'
+
+# for eef-based mapping
+motion_scale: 1.0

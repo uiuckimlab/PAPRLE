@@ -168,7 +168,7 @@ class MujocoEnv(BaseEnv):
         self.sim.data.qvel[:] = 0.0
 
     def close(self):
-        if self.render:
+        if self.render_mode:
             self.sim.close_viewer()
         self.sim = None
         return
@@ -184,6 +184,8 @@ class MujocoEnv(BaseEnv):
 
 if __name__ == '__main__':
     from configs import BaseConfig
+    from paprle.utils.config_utils import change_working_directory
+    change_working_directory()
     from paprle.follower import Robot
 
     robot_config, device_config, env_config = BaseConfig().parse()
