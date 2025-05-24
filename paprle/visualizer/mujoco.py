@@ -21,7 +21,7 @@ class MujocoViz:
 
         self.sim_joint_names = self.env.joint_names
         self.ctrl_joint_idxs, self.mimic_joints_info = self.robot.set_joint_idx_mapping(self.sim_joint_names)
-        self.eef_names = list(self.robot.robot_config.end_effector_link.keys())
+        self.eef_names = self.robot.robot_config.end_effector_link
         self.dof = self.env.n_dof
 
         self.ik_errs  = None

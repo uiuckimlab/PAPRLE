@@ -10,3 +10,5 @@
 - [ ] check power gripper (paprle.hands.power_gripper)
 - [ ] check gripper-trigger joint - make vis better in urdf & xmls
 - [ ] IsaacGym
+- [ ] Leader reprojection - resolve it with direct_joint_mapping boolean and output_type
+- [ ] Stop when  ik err is too high

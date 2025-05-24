@@ -1,6 +1,9 @@
 import numpy as np
 import tkinter as tk
 import copy
+
+from omegaconf import OmegaConf
+
 from paprle.envs.mujoco_env_utils.util import MultiSliderClass
 from threading import Thread
 from pytransform3d import transformations as pt
@@ -11,10 +14,11 @@ import pinocchio as pin
 
 
 class SimPuppeteer:
-    def __init__(self, robot, leader_config, env_config, render_mode='none', verbose=False, *args, **kwargs):
-
+    def __init__(self, follower_robot, leader_config, env_config, render_mode='none', verbose=False, *args, **kwargs):
+        self.follower_robot = follower_robot
         leader_config.robot_cfg = add_info_robot_config(leader_config)
         self.leader_robot = Robot(leader_config)
+        self.leader_config = leader_config
         self.is_ready = False
         self.require_end = False
         self.shutdown = False
@@ -56,27 +60,69 @@ class SimPuppeteer:
         self.direct_joint_mapping = leader_config.output_type == 'joint_pos'
         if not self.direct_joint_mapping:
             self.motion_mapping_method = leader_config.motion_mapping
+            self.motion_scale = leader_config.motion_scale
             # Load Leader Pin Model
-            self.pin_model, collision_model, visual_model = pin.buildModelsFromUrdf(
-                leader_config.asset_cfg.urdf_path,
-                package_dirs=[leader_config.asset_cfg.asset_dir])
-            data = self.pin_model.createData()
-            self.pin_model_joint_names = [name for name in self.pin_model.names]
-            if 'universe' in self.pin_model_joint_names:
-                self.pin_model_joint_names.remove('universe')
-            frame_mapping = {}
-            for i, frame in enumerate(self.pin_model.frames):
-                frame_mapping[frame.name] = i
-            self.end_effector_frame_ids = [frame_mapping[eef_name] for limb_name, eef_name in leader_config.end_effector_link.items()]
-            self.motion_scale = getattr(leader_config, 'motion_scale', 1.0)
-            self.neutral_pos = getattr(leader_config, 'neutral_pos', pin.neutral(self.model))
-            self.neutral_pos = np.array(self.neutral_pos, dtype=np.float32)
-            self.idx_state2pin = [self.leader_robot.joint_names.index(name) for name in self.pin_model_joint_names]
+            self.pin_model, self.pin_data, self.pin_model_joint_names, self.eef_frame_ids = self.load_pin_model(
+                leader_config.robot_cfg.asset_cfg.urdf_path,
+                leader_config.robot_cfg.asset_cfg.asset_dir,
+                leader_config.robot_cfg.end_effector_link
+            )
+            self.idx_pin2state = [[id, self.leader_robot.joint_names.index(name)] for id, name in enumerate(self.pin_model_joint_names) if name in self.leader_robot.joint_names]
+            self.idx_pin2state = np.array(self.idx_pin2state)
 
+            self.hand_mapping = {}
+            for leader_limb_name, leader_hand_joint_idxs in self.leader_robot.ctrl_hand_joint_idx_mapping.items():
+                if len(leader_hand_joint_idxs) > 0:
+                    follower_limb_name = self.leader_config.limb_mapping[leader_limb_name]
+                    follower_hand_joint_idxs = self.follower_robot.ctrl_hand_joint_idx_mapping[follower_limb_name]
+                    if len(follower_hand_joint_idxs) > 0:
+                        self.hand_mapping[leader_limb_name] = leader_hand_joint_idxs
+                    else:
+                        self.hand_mapping[leader_limb_name] = [] # does not output hand joint if follower does not have hand joint
 
+            if self.motion_mapping_method == 'follower_reprojection':
+                # Leader Δq → Virtual Follower Δq → Virtual Follower ΔEEF → Target Follower ΔEEF
+                # Load virtual follower model
+                virtual_follower_config_file = f'configs/follower/{leader_config.direct_mapping_available_robots[0]}.yaml'
+                self.virtual_follower_config = OmegaConf.load(virtual_follower_config_file)
+                self.virtual_follower_config.robot_cfg = add_info_robot_config(self.virtual_follower_config.robot_cfg)
+                urdf_path = self.virtual_follower_config.robot_cfg.asset_cfg.urdf_path
+                asset_dir = self.virtual_follower_config.robot_cfg.asset_cfg.asset_dir
+                self.vfollower_model, self.vfollower_data, self.vfollower_joint_names, self.vfollower_eef_frame_ids = self.load_pin_model(
+                    urdf_path, asset_dir, self.virtual_follower_config.robot_cfg.end_effector_link
+                )
+                self.idx_vfpin2state = []
+                vfollower_ctrl_joint_names = self.virtual_follower_config.robot_cfg.ctrl_joint_names
+                for idx, name in enumerate(self.vfollower_joint_names):
+                    if name in vfollower_ctrl_joint_names:
+                        ctrl_id = vfollower_ctrl_joint_names.index(name)
+                        self.idx_vfpin2state.append([idx, ctrl_id])
+                self.idx_vfpin2state = np.array(self.idx_vfpin2state)
 
+                # make mapping leader_robot.joint_names -> vfollower_model_joint_names
+            elif  self.motion_mapping_method == 'leader_reprojection':
+                # Leader Δq → Leader ΔEEF → Virtual Target-Leader ΔEEF → Virtual Target-Leader Δq → Target Follower Δq
+                # Load target leader model
+                virtual_leader_config_file = f'configs/leader/sim_puppeteer_{follower_robot.name}.yaml'
+                self.virtual_leader_config = OmegaConf.load(virtual_leader_config_file)
+                urdf_path = self.virtual_leader_config.robot_cfg.asset_cfg.urdf_path
+                asset_dir = self.virtual_leader_config.robot_cfg.asset_cfg.asset_dir
+                self.vleader_model, self.vleader_data, self.vleader_joint_names, self.vleader_eef_frame_ids = self.load_pin_model(
+                    urdf_path, asset_dir, self.virtual_leader_config.robot_cfg.end_effector_link
+                )
 
         return
+    def load_pin_model(self, urdf_path, asset_dir, end_effector_link_dict, ):
+        pin_model, collision_model, visual_model = pin.buildModelsFromUrdf(urdf_path, package_dirs=[asset_dir])
+        pin_data = pin_model.createData()
+        pin_model_joint_names = [name for name in pin_model.names]
+        if 'universe' in pin_model_joint_names:
+            pin_model_joint_names.remove('universe')
+        frame_mapping = {}
+        for i, frame in enumerate(pin_model.frames):
+            frame_mapping[frame.name] = i
+        end_effector_frame_ids = [frame_mapping[eef_name] for limb_name, eef_name in end_effector_link_dict.items()]
+        return pin_model, pin_data, pin_model_joint_names, end_effector_frame_ids
 
     def __render_trimesh(self):
         def callback(scene,  **kwargs ):
@@ -103,15 +149,30 @@ class SimPuppeteer:
 
     def launch_init(self, init_env_qpos):
         self.initialize(init_env_qpos)
-        self.last_qpos[:] = init_env_qpos
+
         self.is_ready = True
         self.require_end = False
         return
 
     def initialize(self, init_env_qpos):
-        if init_env_qpos is None:
+        if not self.direct_joint_mapping:
+            init_env_qpos = self.leader_robot.init_qpos.copy()
+            if self.motion_mapping_method in ['direct_scaling', 'leader_reprojection']:
+                pin_qpos = pin.neutral(self.pin_model)
+                pin_qpos[self.idx_pin2state[:, 0]] = init_env_qpos[self.idx_pin2state[:, 1]]
+                self.init_eef_poses = self.get_eef_poses(pin_qpos, self.pin_model, self.pin_data, self.eef_frame_ids)
+            elif self.motion_mapping_method == 'follower_reprojection':
+                pin_qpos = pin.neutral(self.vfollower_model)
+                pin_qpos[self.idx_vfpin2state[:, 0]] = init_env_qpos[self.idx_vfpin2state[:, 1]]
+                self.init_eef_poses = self.get_eef_poses(pin_qpos, self.vfollower_model, self.vfollower_data, self.vfollower_eef_frame_ids)
+            self.init_ts, self.init_Rs = [], []
+            for Rt in self.init_eef_poses:
+                self.init_ts.append(Rt[:3])
+                self.init_Rs.append(Rt[:3, :3])
+        elif init_env_qpos is None:
             init_env_qpos = self.leader_robot.init_qpos.copy()
         self.sliders.set_slider_values(init_env_qpos)
+        self.last_qpos = init_env_qpos
         return
 
     def close_init(self):
@@ -122,11 +183,29 @@ class SimPuppeteer:
         q_from_sliders = self.sliders.get_slider_values()
         self.last_qpos = q_from_sliders
         if self.output_type == 'delta_eef_pose':
-            arm_poses, hand_poses = {}, {}
-            for limb_name in self.leader_robot.limb_names:
-                arm_poses[limb_name] = q_from_sliders[self.leader_robot.ctrl_joint_idx_mapping[limb_name]]
-                hand_poses[limb_name] = q_from_sliders[self.leader_robot.ctrl_hand_joint_idx_mapping[limb_name]]
-            return (arm_poses, hand_poses)
+            if self.motion_mapping_method == 'direct_scaling':
+                pin_qpos = pin.neutral(self.pin_model)
+                pin_qpos[self.idx_pin2state[:, 0]] = q_from_sliders[self.idx_pin2state[:, 1]]
+                new_eef_poses = self.get_eef_poses(pin_qpos, self.pin_model, self.pin_data, self.eef_frame_ids)
+            elif self.motion_mapping_method == 'follower_reprojection':
+                pin_qpos = pin.neutral(self.vfollower_model)
+                pin_qpos[self.idx_vfpin2state[:, 0]] = q_from_sliders[self.idx_vfpin2state[:, 1]]
+                new_eef_poses = self.get_eef_poses(pin_qpos, self.vfollower_model, self.vfollower_data, self.vfollower_eef_frame_ids)
+            else:
+                raise
+
+            local_poses, hand_poses = {}, {}
+            for limb_id, (Rt, init_Rt) in enumerate(zip(new_eef_poses, self.init_eef_poses)):
+                new_pos = init_Rt[:3, :3].T @ Rt[:3, 3] - init_Rt[:3, :3].T @ init_Rt[:3, 3]
+                new_R = init_Rt[:3, :3].T @ Rt[:3, :3]
+                new_pos = new_pos * self.motion_scale
+                new_Rt = pt.transform_from(R=new_R, p=new_pos)
+                leader_limb_name = self.leader_robot.limb_names[limb_id]
+                follower_limb_name = self.leader_config.limb_mapping[leader_limb_name]
+                local_poses[follower_limb_name] = new_Rt
+                hand_poses[follower_limb_name] = q_from_sliders[self.hand_mapping[leader_limb_name]]
+
+            return (local_poses, hand_poses)
         else:
             return q_from_sliders
 
@@ -135,6 +214,14 @@ class SimPuppeteer:
 
     def close(self):
         return
+
+    def get_eef_poses(self, pin_qpos, model, data, eef_frame_ids):
+        pin.forwardKinematics(model, data, pin_qpos)
+        eef_poses = []
+        for frame_id in eef_frame_ids:
+            oMf: pin.SE3 = pin.updateFramePlacement(model, data, frame_id)
+            eef_poses.append(np.array(oMf))
+        return eef_poses
 
 if __name__ == '__main__':
     from configs import BaseConfig

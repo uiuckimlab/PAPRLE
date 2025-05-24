@@ -121,7 +121,20 @@ class Teleoperator:
         if self.command_type == 'joint_pos':
             target_qpos = command
         elif self.command_type == 'delta_eef_pose':
-            pass
+            delta_ee_pose, hand_command = command
+            for follower_limb_name in delta_ee_pose.keys():
+                ΔRt = delta_ee_pose[follower_limb_name]
+                new_world2ee_Rt = self.init_world2ees[follower_limb_name] @ ΔRt
+                new_base2ee_Rt = np.linalg.inv(self.world2bases[follower_limb_name]) @ new_world2ee_Rt
+                pq = pt.pq_from_transform(new_base2ee_Rt)
+                target_ee_poses[follower_limb_name] = pq
+                arm_qpos = self.ik_solvers[follower_limb_name].solve(pos=pq[:3], quat=pq[3:])
+                inds = self.robot.ctrl_joint_idx_mapping[follower_limb_name]
+                if len(hand_command):
+                    hand_qpos = self.hand_solvers[follower_limb_name].solve(hand_command[follower_limb_name])
+                    target_qpos[inds] = np.concatenate([arm_qpos, hand_qpos])
+                else:
+                    target_qpos[inds] = arm_qpos
 
         target_qpos = self.process_joint_pos(target_qpos, initial=initial)
         with self.pos_lock:
