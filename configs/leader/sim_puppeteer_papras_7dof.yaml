@@ -32,7 +32,7 @@ asset_cfg:
 
 direct_mapping_available_robots: ['papras_7dof']
 
-render_base: 'trimesh'
+render_base: 'mujoco'
 viewer_args:
     trimesh:
       pq: [-0.84400246, -0.74844073,  0.63149086,  0.79797548,  0.49961321, -0.17853849, -0.28591218]

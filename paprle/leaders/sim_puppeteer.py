@@ -11,7 +11,7 @@ from paprle.follower import Robot
 from paprle.utils.config_utils import add_info_robot_config
 
 import pinocchio as pin
-
+import time
 
 class SimPuppeteer:
     def __init__(self, follower_robot, leader_config, env_config, render_mode='none', verbose=False, *args, **kwargs):
@@ -19,6 +19,7 @@ class SimPuppeteer:
         leader_config.robot_cfg = add_info_robot_config(leader_config)
         self.leader_robot = Robot(leader_config)
         self.leader_config = leader_config
+        self.env_config = env_config
         self.is_ready = False
         self.require_end = False
         self.shutdown = False
@@ -46,13 +47,11 @@ class SimPuppeteer:
         self.render_mode = render_mode
         render_base = leader_config.render_base
         if render_mode != 'none' and render_base == 'trimesh':
-            from yourdfpy.urdf import URDF
-            self.leader_model = URDF.load(leader_config.asset_cfg.urdf_path)
             self.render_thread = Thread(target=self.__render_trimesh, args=())
             self.render_thread.start()
         elif render_mode != 'none' and render_base == 'mujoco':
-            from paprle.visualizer.mujoco import MujocoViz
-            self.leader_model = MujocoViz(self.leader_robot.robot_config, env_config)
+            self.render_thread = Thread(target=self.__render_mujoco, args=())
+            self.render_thread.start()
 
         self.last_qpos = self.leader_robot.init_qpos
         self.output_type = leader_config.output_type
@@ -125,6 +124,9 @@ class SimPuppeteer:
         return pin_model, pin_data, pin_model_joint_names, end_effector_frame_ids
 
     def __render_trimesh(self):
+        from yourdfpy.urdf import URDF
+        self.leader_model = URDF.load(self.leader_config.asset_cfg.urdf_path)
+
         def callback(scene,  **kwargs ):
             self.leader_model.update_cfg(self.last_qpos)
             # # To get current camera transform
@@ -142,6 +144,30 @@ class SimPuppeteer:
             callback=callback,
             flags={'grid': True}
         )
+
+    def __render_mujoco(self):
+        from paprle.visualizer.mujoco import MujocoViz
+        self.leader_model = MujocoViz(self.leader_robot)
+        self.leader_model.init_viewer(
+            viewer_title=self.leader_robot.robot_config.name, viewer_width=1200, viewer_height=800,
+            viewer_hide_menus=True,
+        )
+        if 'mujoco' in self.leader_config.viewer_args:
+            viewer_args = self.leader_config.viewer_args.mujoco
+            self.leader_model.update_viewer(
+                azimuth=viewer_args.azimuth, distance=viewer_args.distance,
+                elevation=viewer_args.elevation, lookat=viewer_args.lookat,
+                VIS_TRANSPARENT=False,
+            )
+        while not self.shutdown:
+            self.leader_model.set_qpos(self.last_qpos)
+            for limb_name, eef_name in self.leader_robot.eef_names.items():
+                p, R = self.leader_model.env.get_pR_body(eef_name)
+                self.leader_model.env.plot_T(p, R, PLOT_AXIS=True, PLOT_SPHERE=True, sphere_r=0.02, axis_len=0.12, axis_width=0.005)
+            self.leader_model.render()
+            time.sleep(0.01)
+
+
 
     def reset(self, ):
         self.require_end = True
