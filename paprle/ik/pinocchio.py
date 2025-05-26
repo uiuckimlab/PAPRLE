@@ -1,11 +1,7 @@
 import os, sys
 from paprle.ik.base import BaseIKSolver
-try:
-    import pinocchio as pin
-except:
-    sys.path.append("/usr/lib/python3/dist-packages")
-    sys.path.append("/opt/ros/noetic/lib/python3.8/site-packages/")
-    import pinocchio as pin
+from paprle.utils.misc import import_pinocchio
+pin = import_pinocchio()
 from typing import List, Optional, Dict
 import numpy as np
 
@@ -144,7 +140,14 @@ class PinocchioIKSolver(BaseIKSolver):
 
     def get_joint_names(self) -> List[str]:
 
-        # Pinocchio by default add a dummy joint name called "universe"
-        names = list(self.model.names)
-        return names[1:]
+        try:
+            # Pinocchio by default add a dummy joint name called "universe"
+            names = list(self.model.names)
+            return names[1:]
+        except:
+            names = []
+            for f in self.model.frames:
+                if f.type == pin.JOINT:
+                    names.append(f.name)
+            return names
 

@@ -413,7 +413,7 @@ if __name__ == '__main__':
 
     follower_config, leader_config, env_config = BaseConfig().parse()
     robot = Robot(follower_config)
-    leader = SimPuppeteer(robot, leader_config, env_config, render_mode='human')
+    leader = Puppeteer(robot, leader_config, env_config, render_mode='human')
 
     for ep in range(100):
         leader.launch_init(None)

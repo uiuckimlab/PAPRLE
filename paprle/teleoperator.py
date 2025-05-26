@@ -94,8 +94,8 @@ class Teleoperator:
                         self.viz = MujocoViz(self.robot)
                         viewer_args = self.robot.robot_config.viewer_args.mujoco
                         self.viz.init_viewer(viewer_title='Teleoperator',
-                                             viewer_width=viewer_args.viewer_width,
-                                             viewer_height=viewer_args.viewer_height,
+                                             viewer_width=getattr(viewer_args, 'viewer_width', 1200),
+                                             viewer_height=getattr(viewer_args, 'viewer_height', 800),
                                              viewer_hide_menus=True)
                         self.viz.update_viewer(**viewer_args)
                 # print(

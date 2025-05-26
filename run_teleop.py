@@ -36,7 +36,7 @@ class Runner:
         self.robot = Robot(robot_config)
         self.leader = LEADERS_DICT[device_config.type](self.robot, device_config, env_config, render_mode='human') # Get signals from teleop devices, outputs joint positions or eef poses as teleop commands.
         self.teleop = Teleoperator(self.robot, device_config, env_config, render_mode='mujoco') # Solving IK for joint positions if not already given, check collision, and output proper joint positions.
-        self.env = ENV_DICT[env_config.name](self.robot, device_config, env_config, render_mode='', leader=self.leader) # Actually send joint positions to the robot.
+        self.env = ENV_DICT[env_config.name](self.robot, device_config, env_config, render_mode='human', leader=self.leader) # Actually send joint positions to the robot.
         self.env.vis_info = self.leader.update_vis_info(self.env.vis_info)
 
         # self.feedback = Feedback(self.leader, self.teleop, self.env, robot_config, device_config)

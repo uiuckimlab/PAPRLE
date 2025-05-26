@@ -28,10 +28,12 @@ dependencies = [
    #"sim_web_visualizer",
 ]
 
+
 [project.optional-dependencies]
-mujoco = [
-  "mujoco==3.1.4",
-  "dm-control"
+joycon = [
+  "joycon-python",
+  "hidapi",
+  'pyglm'
 ]
 
 [build-system]

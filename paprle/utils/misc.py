@@ -28,3 +28,31 @@ def detect_ros_version():
         elif ros_distro in ros2_distros:
             return "ROS2"
     return "Unknown"
+
+def import_pinocchio():
+    # get python version
+    import sys
+    py = sys.version_info
+
+    if py.major == 3 and py.minor == 10:
+        removed_p = []
+        for p in sys.path:
+            if 'noetic' in p:
+                sys.path.remove(p)
+                removed_p.append(p)
+    elif py.major == 3 and py.minor == 8:
+        removed_p = []
+        for p in sys.path:
+            if 'humble' in p:
+                sys.path.remove(p)
+                removed_p.append(p)
+
+    try:
+        import pinocchio as pin
+    except ImportError:
+        raise
+
+    sys.path.extend(removed_p)
+    return pin
+
+import_pinocchio()

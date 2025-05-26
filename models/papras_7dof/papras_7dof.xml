@@ -92,6 +92,22 @@
       </body>
     </body>
   </worldbody>
+  <actuator>
+    <!-- Arm joints -->
+    <motor name="robot1/joint1" joint="robot1/joint1" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot1/joint2" joint="robot1/joint2" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot1/joint3" joint="robot1/joint3" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot1/joint4" joint="robot1/joint4" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot1/joint5" joint="robot1/joint5" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot1/joint6" joint="robot1/joint6" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot1/joint7" joint="robot1/joint7" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+
+    <!-- Gripper joints -->
+    <motor name="robot1/gripper" joint="robot1/gripper" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+    <motor name="robot1/gripper_r2" joint="robot1/gripper_r2" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+    <motor name="robot1/gripper_l1" joint="robot1/gripper_l1" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+    <motor name="robot1/gripper_l2" joint="robot1/gripper_l2" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+  </actuator>
   <contact>
     <exclude body1="robot1/link1" body2="robot1/link2" />
     <exclude body1="robot1/link1" body2="world" />
