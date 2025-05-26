@@ -1,0 +1,341 @@
+import rclpy
+import numpy as np
+import time
+import copy
+from threading import Thread, Lock
+from rclpy.node import Node
+from rclpy.parameter import Parameter, ParameterType
+from rcl_interfaces.srv import GetParameters
+from paprle.envs.base_env import BaseEnv
+from std_msgs.msg import Header
+from sensor_msgs.msg import JointState
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from pymoveit2 import MoveIt2, MoveIt2State
+import xml.etree.ElementTree as ET
+from functools import partial
+
+class JointStateSubscriber(Node):
+    def __init__(self, sub_info, output_joint_names):
+        super().__init__('joint_state_subscriber')
+        self.output_joint_names = output_joint_names
+        self.joint_mapping = {}
+        self.sub_info = sub_info
+        self.flag_first_state_updated = {}
+        for sub_topic, sub_info in sub_info.items():
+            sub_msg_type = sub_info['type']
+            self.joint_mapping[sub_topic] = None
+            self.create_subscription(
+                JointState,
+                sub_topic,
+                partial(self.listener_callback, topic=sub_topic),
+                10
+            )
+            self.flag_first_state_updated[sub_topic] = False
+        self.lock = Lock()
+        self.states = {
+            'pos': np.zeros(len(output_joint_names)),
+            'vel': np.zeros(len(output_joint_names)),
+            'eff': np.zeros(len(output_joint_names))
+        }
+
+    def listener_callback(self, msg, topic):
+        if self.joint_mapping[topic] is None:
+            self.joint_mapping[topic] = []
+            for id, name in enumerate(msg.name):
+                if name in self.output_joint_names:
+                    self.joint_mapping[topic].append((id, self.output_joint_names.index(name)))
+            self.joint_mapping[topic] = np.array(self.joint_mapping[topic])
+        with self.lock:
+            id1, id2 = self.joint_mapping[topic][:, 0], self.joint_mapping[topic][:, 1]
+            self.states['pos'][id2] = np.array(msg.position)[id1]
+            self.states['vel'][id2] = np.array(msg.velocity)[id1]
+            self.states['eff'][id2] = np.array(msg.effort)[id1]
+        self.flag_first_state_updated[topic] = True
+
+class ControllerPublisher(Node):
+    def __init__(self, pub_info, command_joint_names, joint_states, timer_period=0.02):
+        super().__init__('controller_publisher')
+        self.timer_period = timer_period
+        self.pub_info = pub_info
+        self.pubs = {}
+        self.command_pos, self.command_vel, self.command_acc = None, None, None
+        self.command_joint_names = command_joint_names
+        self.joint_mapping = {}
+        self.duration_msg = rclpy.duration.Duration(seconds=timer_period).to_msg()
+        self.mode = 'direct_publish' # 'interpolate'
+        self.interpolate_time_ = {}
+        self.interpolate_duration = 3.0
+        self.joint_states = joint_states
+        for pub_topic, pub_info in pub_info.items():
+            pub_msg_type = eval(pub_info['type'])
+            self.joint_mapping[pub_topic] = [command_joint_names.index(name) for name in pub_info['joint_names']]
+            self.pubs[pub_topic] = self.create_publisher(pub_msg_type, pub_topic, 10)
+            self.interpolate_time_[pub_topic] = 0.0
+            self.create_timer(timer_period, partial(self.publish, pub_topic))
+
+    def publish(self, topic):
+        if self.command_pos is not None:
+            msg = JointTrajectory()
+            msg.header = Header()
+            msg.header.stamp = self.get_clock().now().to_msg()
+            msg.joint_names = self.pub_info[topic]['joint_names']
+            mapping_inds = self.joint_mapping[topic]
+            if self.mode == 'direct_publish':
+                pos = self.command_pos[mapping_inds]
+                if 'arm3' in topic:
+                    print(pos)
+                vel = [] if self.command_vel is None else self.command_vel[mapping_inds]
+                acc = [] if self.command_acc is None else self.command_acc[mapping_inds]
+            else:
+                ratio = min(self.interpolate_time_[topic]/self.interpolate_duration, 1.0)
+                pos = (1-ratio) * self.joint_states['pos'][mapping_inds] + ratio * self.command_pos[mapping_inds]
+                vel = [0.0] * len(mapping_inds)
+                acc = [0.0] * len(mapping_inds)
+                self.interpolate_time_[topic] += self.timer_period
+            msg.points = [JointTrajectoryPoint(positions=pos, velocities=vel, accelerations=acc,
+                                               time_from_start=self.duration_msg)]
+            self.pubs[topic].publish(msg)
+
+# TODO: change use_sim_time param to True if you want to use gazebo
+class ROS2Env(BaseEnv):
+    def __init__(self, robot, device_config, env_config, verbose=False, render_mode=False, **kwargs):
+        super().__init__(robot, device_config, env_config, verbose=verbose, render_mode=render_mode, **kwargs)
+        try:
+            rclpy.init()
+        except:
+            print("rclpy already initialized")
+
+        self.motion_planning_method = robot.ros2_config.motion_planning
+        if self.motion_planning_method == 'moveit':
+            self.moveit_node = Node('teleop_env_moveit')
+            self.moveit_config = robot.ros2_config.moveit
+            self.get_param_cli = None
+            self.setup_moveit()
+
+            use_sim_time_param = self.get_move_group_params('use_sim_time')
+            self.use_sim_time = use_sim_time_param if isinstance(use_sim_time_param,  bool) else use_sim_time_param.bool_value
+        else:
+            self.use_sim_time = True
+
+
+        # Setup Subscribers and Publishers
+        topics_to_sub, topics_to_pub = {}, {}
+        for limb_name, limb_info in robot.ros2_config.robots.items():
+            arm_state_sub_topic = limb_info['arm_state_sub_topic']
+            joint_names = robot.robot_config.limb_joint_names[limb_name]
+            if arm_state_sub_topic not in topics_to_sub:
+                topics_to_sub[arm_state_sub_topic] = {'type': limb_info['arm_state_sub_msg_type'], 'joint_names': []}
+            topics_to_sub[arm_state_sub_topic]['joint_names'].extend(joint_names)
+
+            arm_control_pub_topic = limb_info['arm_control_topic']
+            if arm_control_pub_topic not in topics_to_pub:
+                topics_to_pub[arm_control_pub_topic] = {'type': limb_info['arm_control_msg_type'], 'joint_names': []}
+            topics_to_pub[arm_control_pub_topic]['joint_names'].extend(joint_names)
+
+            hand_state_sub_topic = limb_info['hand_state_sub_topic']
+            hand_joint_names = robot.robot_config.hand_joint_names[limb_name]
+            if hand_state_sub_topic not in topics_to_sub:
+                topics_to_sub[hand_state_sub_topic] = {'type': limb_info['hand_state_msg_type'], 'joint_names': []}
+            topics_to_sub[hand_state_sub_topic]['joint_names'].extend(hand_joint_names)
+
+            hand_control_pub_topic = limb_info['hand_control_topic']
+            if hand_control_pub_topic not in topics_to_pub:
+                topics_to_pub[hand_control_pub_topic] = {'type': limb_info['hand_control_msg_type'], 'joint_names': []}
+            topics_to_pub[hand_control_pub_topic]['joint_names'].extend(hand_joint_names)
+
+        self.state_subscriber = JointStateSubscriber(topics_to_sub, robot.joint_names)
+        self.state_subscriber.set_parameters([Parameter('use_sim_time', value=self.use_sim_time)])
+        def spin_executor(node, spin_name='', mode='single'):
+            from rclpy.executors import SingleThreadedExecutor, MultiThreadedExecutor
+            if mode == 'single':
+                executor = SingleThreadedExecutor()
+            else:
+                executor = MultiThreadedExecutor()
+            executor.add_node(node)
+            executor.spin()
+            print(f"Shutting down {spin_name}")
+            return
+        self.sub_thread = Thread(target=spin_executor, args=(self.state_subscriber,"Subscriber Thread"))
+        self.sub_thread.start()
+
+        # TODO: Maybe wait here until the first state is updated
+        iter = 0
+        while not all(self.state_subscriber.flag_first_state_updated.values()):
+            ss = '.' * (iter % 5 + 1)
+            print("[Env] Waiting for first state update.." + ss, end='\r')
+            time.sleep(0.1)
+            iter += 1
+
+        self.command_lock = Lock()
+        self.controller_publisher = ControllerPublisher(topics_to_pub, robot.joint_names, self.state_subscriber.states)
+        self.controller_publisher.set_parameters([Parameter('use_sim_time', value=self.use_sim_time)])
+        self.pub_thread = Thread(target=spin_executor, args=(self.controller_publisher,"Publisher Thread",'multi'))
+        self.pub_thread.start()
+
+
+
+    def setup_get_move_group_params(self):
+        self.get_param_cli = self.moveit_node.create_client(GetParameters, '/move_group/get_parameters')
+        while not self.get_param_cli.wait_for_service(timeout_sec=1.0):
+            self.moveit_node.get_logger().info('[Env] [Moveit] service not available, waiting again...')
+        self.req = GetParameters.Request()
+        return
+
+    def get_move_group_params(self, param):
+        if self.get_param_cli is None: self.setup_get_move_group_params()
+        self.req.names = [param]
+        itreation = 0
+        while True:
+            itreation += 1
+            self.future = self.get_param_cli.call_async(self.req)
+            rclpy.spin_until_future_complete(self.moveit_node, self.future, timeout_sec=1.0)
+            if self.future.result() is not None:
+                return self.future.result().values[0]
+            elif itreation > 10: return False
+            else:
+                print("Service call failed %r" % (self.future.exception(),))
+                time.sleep(1)
+                continue
+
+    def moveit_extract_joint_info(self):
+        semantic_description = self.get_move_group_params('robot_description_semantic')
+        self.moveit_info = ET.fromstring(semantic_description.string_value)
+        self.moveit_group_poses, self.moveit_arms_joint_names, self.moveit_hand_joint_names = {}, [], []
+        for child in self.moveit_info :
+            if child.tag == 'group_state' and child.attrib['group'] == self.moveit_config.arm_group_name:
+                if self.moveit_config.arm_group_name not in self.moveit_group_poses:
+                    self.moveit_group_poses[self.moveit_config.arm_group_name] = {}
+                self.moveit_group_poses[self.moveit_config.arm_group_name][child.attrib['name']] = []
+                for joint in child:
+                    self.moveit_group_poses[self.moveit_config.arm_group_name][child.attrib['name']].append(float(joint.attrib['value']))
+                if len(self.moveit_arms_joint_names) == 0:
+                    self.moveit_arms_joint_names = [joint.attrib['name'] for joint in child]
+            elif child.tag == 'group_state' and child.attrib['group'] == self.moveit_config.hand_group_name:
+                if self.moveit_config.hand_group_name not in self.moveit_group_poses:
+                    self.moveit_group_poses[self.moveit_config.hand_group_name] = {}
+                self.moveit_group_poses[self.moveit_config.hand_group_name][child.attrib['name']] = []
+                for joint in child:
+                    self.moveit_group_poses[self.moveit_config.hand_group_name][child.attrib['name']].append(float(joint.attrib['value']))
+                if len(self.moveit_hand_joint_names) == 0:
+                    self.moveit_hand_joint_names = [joint.attrib['name'] for joint in child]
+        self.ctrl2moveit_arm_mapping = np.array([
+            [id, self.moveit_arms_joint_names.index(name)]
+            for id, name in enumerate(self.robot.joint_names)
+            if name in self.moveit_arms_joint_names
+        ])
+        self.ctrl2moveit_hand_mapping = np.array([
+            [id, self.moveit_hand_joint_names.index(name)]
+            for id, name in enumerate(self.robot.joint_names)
+            if name in self.moveit_hand_joint_names
+        ])
+        return
+
+    def setup_moveit(self):
+        self.moveit_extract_joint_info()
+        self.arms_group = MoveIt2(node=self.moveit_node, joint_names=self.moveit_arms_joint_names,
+                                  base_link_name='', end_effector_name='',
+                                  group_name=self.moveit_config.arm_group_name, use_move_group_action=self.moveit_config.use_move_group_action)
+        self.arms_group.num_planning_attempts = self.moveit_config.num_planning_attempts
+        self.arms_group.allowed_planning_time = self.moveit_config.planning_time
+        self.arms_group.max_velocity = self.moveit_config.max_velocity_scaling_factor
+
+        self.arms_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.arm_group_name]['init'])
+        self.arms_group.wait_until_executed()
+
+        if self.moveit_hand_joint_names:
+            self.hand_group = MoveIt2(node=self.moveit_node, joint_names=self.moveit_hand_joint_names,
+                                      base_link_name='', end_effector_name='',
+                                      group_name=self.moveit_config.hand_group_name, use_move_group_action=True)
+            self.hand_group.num_planning_attempts = self.moveit_config.num_planning_attempts
+            self.hand_group.allowed_planning_time = self.moveit_config.planning_time
+            self.hand_group.max_velocity = self.moveit_config.max_velocity_scaling_factor
+            self.hand_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.hand_group_name]['init'])
+            self.hand_group.wait_until_executed()
+        return
+
+    def initialize(self, initial_qpos: np.ndarray) -> None:
+        if self.motion_planning_method == 'moveit':
+            moveit_pose = np.zeros(len(self.moveit_arms_joint_names))
+            moveit_pose[self.ctrl2moveit_arm_mapping[:,1]] = initial_qpos[self.ctrl2moveit_arm_mapping[:,0]]
+            self.arms_group.move_to_configuration(moveit_pose, joint_names=self.moveit_arms_joint_names)
+            self.arms_group.wait_until_executed()
+        else:
+            self.controller_publisher.interpolate_duration = 2.0
+            self.controller_publisher.interpolate_time_ = {
+                k: 0.0 for k in self.controller_publisher.interpolate_time_.keys()
+            }
+            self.controller_publisher.mode = 'interpolate'
+            with self.command_lock:
+                self.controller_publisher.command_pos = initial_qpos
+            while not (np.array(list(self.controller_publisher.interpolate_time_.values())) > self.controller_publisher.interpolate_duration).all():
+                time.sleep(0.1)
+
+        self.controller_publisher.mode = 'direct_publish'
+        self.controller_publisher.interpolate_time_ = {
+            k: 0.0 for k in self.controller_publisher.interpolate_time_.keys()
+        }
+        with self.command_lock:
+            self.controller_publisher.command_pos = copy.deepcopy(self.state_subscriber.states['pos'])
+            self.controller_publisher.command_vel = np.zeros_like(self.state_subscriber.states['vel'])
+
+        self.initialized = True
+        return
+
+    def close(self):
+        self.rest_position()
+        with self.command_lock:
+            self.controller_publisher.command_pos = None
+        self.controller_publisher.destroy_node()
+        self.state_subscriber.destroy_node()
+        self.moveit_node.destroy_node()
+        return
+
+    def rest_position(self):
+        self.arms_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.arm_group_name]['rest'])
+        self.arms_group.wait_until_executed()
+        if self.moveit_hand_joint_names:
+            self.hand_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.hand_group_name]['init'])
+            self.hand_group.wait_until_executed()
+        return
+
+    def reset(self):
+        if self.motion_planning_method == 'moveit':
+            # when we expect moveit to move the robot,
+            # we need to clear out the current target command to not interfere with moveit
+            with self.command_lock:
+                self.controller_publisher.command_pos = None
+                self.controller_publisher.command_vel = None
+                self.controller_publisher.command_acc = None
+        # else, we will just interpolate the poses to the init pose, so we don't need to clear the target qpos
+        # actually, considering g1, it is not good to clear the target qpos, because it will make g1 to damping mode - dangerous!
+
+
+
+
+
+
+
+
+
+if __name__ == '__main__':
+    from configs import BaseConfig
+    from paprle.utils.config_utils import change_working_directory
+    change_working_directory()
+    from paprle.follower import Robot
+
+    robot_config, device_config, env_config = BaseConfig().parse()
+    robot = Robot(robot_config)
+    env = ROS2Env(robot, device_config, env_config, verbose=False, render_mode='mujoco')
+    obs = env.reset()
+    env.initialize(robot.init_qpos)
+
+    min_qpos = robot.joint_limits[:, 0] + 0.3
+    max_qpos = robot.joint_limits[:, 1] - 0.3
+    interpolate_trajectory = np.linspace(min_qpos, max_qpos, num=1000)
+    while True:
+        env.initialize(interpolate_trajectory[0])
+        for i in range(100):
+            action = interpolate_trajectory[i]
+            obs, rew, done, info = env.step(action)
+            if done:
+                break

@@ -1,5 +1,6 @@
 from paprle.utils.config_utils import change_working_directory
 change_working_directory()
+
 import argparse
 from paprle.envs.mujoco_env_utils.mujoco_parser import MuJoCoParserClass
 from paprle.envs.mujoco_env_utils.util import MultiSliderClass,get_idxs

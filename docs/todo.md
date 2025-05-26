@@ -32,3 +32,8 @@
 - [ ] add followers: g1
 - [ ] add followers: other humanoids
 - [ ] add followers: OMY
+
+- [ ] ROS1 env
+- [ ] ROS2 env
+- [ ] Camera
+- 

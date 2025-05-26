@@ -18,9 +18,8 @@ robot_cfg:
   end_effector_link:
     robot3: 'robot3/end_effector_link'
     robot4: 'robot4/end_effector_link'
-  named_poses:
-    #TODO: maybe read this info from srdf file, but conditionally. If not found, use this info
-    init: [0.384, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0,
+
+  init_qpos: [0.384, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0,
            -0.384, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0]
   viewer_args:
     mujoco:
@@ -63,3 +62,38 @@ ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
     eps: 1e-3
     base_link: robot4/link1 # base_link in the original urdf file,not the base_link in the ik model
 
+ros2_cfg:
+  arm_lp_filter_alpha: 0.95
+  hand_lp_filter_alpha: 0.5
+  motion_planning: 'interpolate' # moveit or interpolation
+  moveit:
+    namespace: 'followers'
+    arm_group_name: 'arm34'
+    hand_group_name: 'gripper34'
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: True
+  state_sub_topic: '/joint_states' # Topic to subscribe for joint states
+  state_sub_msg_type: 'sensor_msgs/msg/JointState' # Message type for joint states
+  robots:
+    robot3:
+      arm_control_topic: '/arm3_controller/joint_trajectory'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/gripper3_controller/joint_trajectory'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+    robot4:
+      arm_control_topic: '/arm4_controller/joint_trajectory'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/gripper4_controller/joint_trajectory'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+  cameras: []

@@ -1,11 +1,12 @@
-
+from paprle.utils.config_utils import change_working_directory
+change_working_directory()
 import argparse
 from pathlib import Path
 import numpy as np
 from isaacgym import gymapi
 from yourdfpy.urdf import URDF
 import os
-
+# https://github.com/dexsuite/dex-urdf/blob/main/example/render_urdf_isaacgym.py
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("urdf", type=str, help="Path to the URDF file.")
@@ -79,13 +80,12 @@ def visualize_urdf(urdf_file, simulate, disable_self_collision, fix_root):
     asset_path = os.path.join(*urdf_file.split("/")[1:])
     asset_root = 'models/'
     asset_name = "urdf_asset"
-    asset_file = urdf_file
 
     # Load asset with default control type of position for all joints
     asset_options = gymapi.AssetOptions()
     asset_options.fix_base_link = fix_root
     asset_options.convex_decomposition_from_submeshes = True
-    asset_options.flip_visual_attachments = False # True for UR5
+    asset_options.flip_visual_attachments = False # True for some models
     # asset_options.vhacd_enabled = True
     # asset_options.vhacd_params.resolution = 1000000
     # asset_options.vhacd_params.max_convex_hulls = 60
@@ -156,7 +156,7 @@ def visualize_urdf(urdf_file, simulate, disable_self_collision, fix_root):
             print("")
         if simulate:
             # step the physics
-            qpos = trajectory[step] * 0.0
+            qpos = trajectory[step] #* 0.0
             if len(mimic_joints_info) > 0:
                 qpos[mimic_joints_info[:, 0].astype(np.int32)] = qpos[mimic_joints_info[:, 1].astype(np.int32)] * mimic_joints_info[:, 2] + mimic_joints_info[:, 3]
             for i in range(num_dof):

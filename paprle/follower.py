@@ -5,6 +5,7 @@ class Robot:
     def __init__(self, follower_config):
         self.robot_config = follower_config.robot_cfg
         self.ik_config = getattr(follower_config, 'ik_cfg', None)
+        self.ros2_config = getattr(follower_config, 'ros2_cfg', None)
 
         self.name = self.robot_config.name
 
@@ -30,7 +31,7 @@ class Robot:
         self.joint_limits = np.array(self.joint_limits)
 
         self.base_pose = None # Setup when the robot is loaded
-        self.init_qpos = getattr(self.robot_config, 'init_qpos', np.zeros(self.num_joints))
+        self.init_qpos = np.array(getattr(self.robot_config, 'init_qpos', np.zeros(self.num_joints)))
 
     def random_qpos(self):
         return  np.random.uniform(low=self.joint_limits[:, 0], high=self.joint_limits[:, 1])
