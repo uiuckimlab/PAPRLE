@@ -13,7 +13,7 @@ class BaseEnv:
         self.view_im = None
 
         self.num_joints = 10 # Number of total joints
-
+        self.vis_info = {}
         return
 
     def close(self) -> None:

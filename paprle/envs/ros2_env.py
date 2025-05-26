@@ -14,6 +14,22 @@ from pymoveit2 import MoveIt2, MoveIt2State
 import xml.etree.ElementTree as ET
 from functools import partial
 
+
+def lp_filter(new_value, prev_value, alpha=0.5):
+    if prev_value is None: return new_value
+    if not isinstance(prev_value, np.ndarray): prev_value = np.array(prev_value)
+    if not isinstance(new_value, np.ndarray): new_value = np.array(new_value)
+    if prev_value.shape != new_value.shape:
+        prev_value = prev_value.mean(0)
+    y = alpha * new_value + (1 - alpha) * prev_value
+    return y
+
+def calculate_vel(last_qpos, qpos, dt):
+    if last_qpos.shape != qpos.shape:
+        last_qpos = last_qpos.mean(0)
+    vel = (qpos - last_qpos) / dt
+    return vel
+
 class JointStateSubscriber(Node):
     def __init__(self, sub_info, output_joint_names):
         super().__init__('joint_state_subscriber')
@@ -82,8 +98,6 @@ class ControllerPublisher(Node):
             mapping_inds = self.joint_mapping[topic]
             if self.mode == 'direct_publish':
                 pos = self.command_pos[mapping_inds]
-                if 'arm3' in topic:
-                    print(pos)
                 vel = [] if self.command_vel is None else self.command_vel[mapping_inds]
                 acc = [] if self.command_acc is None else self.command_acc[mapping_inds]
             else:
@@ -167,6 +181,8 @@ class ROS2Env(BaseEnv):
             iter += 1
 
         self.command_lock = Lock()
+        self.last_command, self.lp_filter_alpha = None, self.robot.ros2_config.lp_filter_alpha
+        self.last_vel, self.dt = None, self.robot.control_dt
         self.controller_publisher = ControllerPublisher(topics_to_pub, robot.joint_names, self.state_subscriber.states)
         self.controller_publisher.set_parameters([Parameter('use_sim_time', value=self.use_sim_time)])
         self.pub_thread = Thread(target=spin_executor, args=(self.controller_publisher,"Publisher Thread",'multi'))
@@ -274,10 +290,11 @@ class ROS2Env(BaseEnv):
         self.controller_publisher.interpolate_time_ = {
             k: 0.0 for k in self.controller_publisher.interpolate_time_.keys()
         }
+        curr_pose = copy.deepcopy(self.state_subscriber.states['pos'])
         with self.command_lock:
-            self.controller_publisher.command_pos = copy.deepcopy(self.state_subscriber.states['pos'])
+            self.controller_publisher.command_pos = curr_pose
             self.controller_publisher.command_vel = np.zeros_like(self.state_subscriber.states['vel'])
-
+        self.last_command = curr_pose
         self.initialized = True
         return
 
@@ -306,8 +323,49 @@ class ROS2Env(BaseEnv):
                 self.controller_publisher.command_pos = None
                 self.controller_publisher.command_vel = None
                 self.controller_publisher.command_acc = None
-        # else, we will just interpolate the poses to the init pose, so we don't need to clear the target qpos
-        # actually, considering g1, it is not good to clear the target qpos, because it will make g1 to damping mode - dangerous!
+
+            self.arms_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.arm_group_name]['init'])
+            self.arms_group.wait_until_executed()
+
+            if self.moveit_hand_joint_names:
+                self.hand_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.hand_group_name]['init'])
+                self.hand_group.wait_until_executed()
+        else:
+            # else, we will just interpolate the poses to the init pose, so we don't need to clear the target qpos
+            # actually, considering g1, it is not good to clear the target qpos, because it will make g1 to damping mode - dangerous!
+            self.controller_publisher.interpolate_duration = 2.0
+            self.controller_publisher.interpolate_time_ = {
+                k: 0.0 for k in self.controller_publisher.interpolate_time_.keys()
+            }
+            self.controller_publisher.mode = 'interpolate'
+            init_qpos = self.robot.init_qpos.copy()
+            with self.command_lock:
+                self.controller_publisher.command_pos = init_qpos
+            while not (np.array(list(self.controller_publisher.interpolate_time_.values())) > self.controller_publisher.interpolate_duration).all():
+                time.sleep(0.1)
+        self.controller_publisher.mode = 'direct_publish'
+        self.controller_publisher.interpolate_time_ = {
+            k: 0.0 for k in self.controller_publisher.interpolate_time_.keys()
+        }
+        with self.command_lock:
+            self.controller_publisher.command_pos = copy.deepcopy(self.state_subscriber.states['pos'])
+            self.controller_publisher.command_vel = np.zeros_like(self.state_subscriber.states['vel'])
+    
+        return np.array(self.state_subscriber.states['pos'].copy())
+    
+    def step(self, command):
+        pos = lp_filter(command, self.last_command, self.lp_filter_alpha)
+        vel = calculate_vel(self.last_command, pos, self.dt)
+        if self.last_vel is not None:
+            acc = calculate_vel(self.last_vel, vel, self.dt)
+        else:
+            acc = None
+
+        with self.command_lock:
+            self.controller_publisher.command_pos = pos
+            self.controller_publisher.command_vel = vel
+            self.controller_publisher.command_acc = acc
+        return 
 
 
 

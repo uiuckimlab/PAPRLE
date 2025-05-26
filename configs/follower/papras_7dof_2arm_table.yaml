@@ -63,8 +63,7 @@ ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
     base_link: robot4/link1 # base_link in the original urdf file,not the base_link in the ik model
 
 ros2_cfg:
-  arm_lp_filter_alpha: 0.95
-  hand_lp_filter_alpha: 0.5
+  lp_filter_alpha: 0.9
   motion_planning: 'interpolate' # moveit or interpolation
   moveit:
     namespace: 'followers'
