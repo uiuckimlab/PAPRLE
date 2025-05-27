@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <robot name="teleop_table">
     <mujoco>
-       <compiler angle="radian" meshdir="../" autolimits="true" strippath="false" fusestatic="false"/>
+       <compiler angle="radian" meshdir="../../" autolimits="true" strippath="false" fusestatic="false"/>
     </mujoco>
   <material name="black">
     <color rgba="0.0 0.0 0.0 1.0"/>

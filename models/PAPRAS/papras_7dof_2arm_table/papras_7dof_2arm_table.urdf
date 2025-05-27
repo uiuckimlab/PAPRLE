@@ -5,7 +5,7 @@
 <!-- =================================================================================== -->
 <robot name="teleop_table">
     <mujoco>
-       <compiler angle="radian" meshdir="../" autolimits="true" strippath="false" fusestatic="false"/>
+       <compiler angle="radian" meshdir="../../" autolimits="true" strippath="false" fusestatic="false"/>
     </mujoco>
   <!-- PAPRAS URDF Macros -->
   <!-- Main URDF File should contain:

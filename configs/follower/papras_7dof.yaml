@@ -3,8 +3,8 @@ robot_cfg:
   name: papras_7dof
   asset_cfg:
     asset_dir: ${mesh_dir} # Directory for assets
-    urdf_path: 'models/papras_7dof/papras_7dof.urdf' # Path to the URDF file
-    xml_path: 'models/papras_7dof/papras_7dof.xml' # If you have xml file, specify the path here or just use urdf file here as well
+    urdf_path: 'models/PAPRAS/papras_7dof/papras_7dof.urdf' # Path to the URDF file
+    xml_path: 'models/PAPRAS/papras_7dof/papras_7dof.xml' # If you have xml file, specify the path here or just use urdf file here as well
   ignore_collision_pairs: []
   control_dt: 0.02 # Control loop frequency - if we are using joint trajectory controller, it is enough
   eef_type: 'parallel_gripper' # Type of end effector: 'hand', 'power_gripper', 'parallel_gripper'

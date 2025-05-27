@@ -3,8 +3,8 @@ robot_cfg:
   name: papras_7dof_2arm_table
   asset_cfg:
     asset_dir: ${mesh_dir} # Directory for assets
-    urdf_path: 'models/papras_7dof_2arm_table/papras_7dof_2arm_table.urdf' # Path to the URDF file
-    xml_path: 'models/papras_7dof_2arm_table/papras_7dof_2arm_table.xml' # If you have xml file, specify the path here or just use urdf file here as well
+    urdf_path: 'models/PAPRAS/papras_7dof_2arm_table/papras_7dof_2arm_table.urdf' # Path to the URDF file
+    xml_path: 'models/PAPRAS/papras_7dof_2arm_table/papras_7dof_2arm_table.xml' # If you have xml file, specify the path here or just use urdf file here as well
   ignore_collision_pairs: []
   control_dt: 0.02 # Control loop frequency - if we are using joint trajectory controller, it is enough
   eef_type: 'parallel_gripper' # Type of end effector: 'hand', 'power_gripper', 'parallel_gripper'
@@ -47,7 +47,7 @@ ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
     ee_link: robot1/end_effector_link
     dt: 0.05
     asset_dir: ${mesh_dir} # Directory for assets
-    urdf_path: 'models/papras_7dof/papras_7dof.urdf'
+    urdf_path: 'models/PAPRAS/papras_7dof/papras_7dof.urdf'
     ik_damping: 0.075
     eps: 1e-3
     base_link: robot3/link1 # base_link in the original urdf file,not the base_link in the ik model
@@ -57,7 +57,7 @@ ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
     ee_link: robot1/end_effector_link
     dt: 0.05
     asset_dir: ${mesh_dir} # Directory for assets
-    urdf_path: 'models/papras_7dof/papras_7dof.urdf'
+    urdf_path: 'models/PAPRAS/papras_7dof/papras_7dof.urdf'
     ik_damping: 0.075
     eps: 1e-3
     base_link: robot4/link1 # base_link in the original urdf file,not the base_link in the ik model

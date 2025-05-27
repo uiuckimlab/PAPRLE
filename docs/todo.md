@@ -36,4 +36,4 @@
 - [ ] add followers: g1
 - [ ] add followers: other humanoids
 - [ ] add followers: OMY
-
+- [ ] clean up collision checking part

@@ -1,7 +1,8 @@
 <mujoco model="teleop_table">
-  <compiler angle="radian" meshdir="../"/>
-  <include file="../assets/scene/floor_sky.xml" />
+  <compiler angle="radian" meshdir="../../"/>
+  <include file="../../assets/scene/floor_sky.xml" />
   <asset>
+    <mesh name="table" file="assets/scene/table.stl"/>
     <mesh name="link1" file="assets/papras/link1.stl" scale="0.001 0.001 0.001"/>
     <mesh name="link2" file="assets/papras/link2.stl" scale="0.001 0.001 0.001"/>
     <mesh name="link3" file="assets/papras/7dof/link3.stl"/>
@@ -21,6 +22,7 @@
   <worldbody>
     <body name="env" quat="0.000796327 0 0 1">
       <inertial pos="-0.00217819 0.0115131 4.82153e-05" quat="0.707114 -9.18314e-06 9.18295e-06 0.707099" mass="24.32" diaginertia="3.22235 2.59731 0.632618"/>
+      <geom type="mesh" rgba="0.501961 0.501961 0.501961 1" mesh="table"/>
       <body name="robot3/link1" pos="-0.2599 0.50565 -0.05189">
         <inertial pos="0.00023 0 0.06223" quat="0.999978 0 -0.00662802 0" mass="0.85644" diaginertia="0.00121079 0.00120886 0.000380884"/>
         <geom type="mesh" mesh="link1"/>

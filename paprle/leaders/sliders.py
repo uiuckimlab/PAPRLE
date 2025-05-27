@@ -48,11 +48,14 @@ class Sliders:
         return
 
     def __render(self):
+        joint_mapping_inds = [self.leader_model.actuated_joint_names.index(name) for name in self.robot.joint_names]
         def callback(scene,  **kwargs ):
-            self.leader_model.update_cfg(self.last_qpos)
+            leader_model_pose =  np.zeros(len(self.leader_model.actuated_joint_names))
+            leader_model_pose[joint_mapping_inds] = self.last_qpos
+            self.leader_model.update_cfg(leader_model_pose)
             # # To get current camera transform
             # print(self.leader_model._scene.camera_transform)
-            # print(pt.pq_from_transform(self.leader_model._scene.camera_transform))
+            # print("pq: ", pt.pq_from_transform(self.leader_model._scene.camera_transform).tolist())
 
         if 'trimesh' in self.robot.robot_config.viewer_args:
             pq = self.robot.robot_config.viewer_args.trimesh.pq

@@ -13,6 +13,7 @@ class MujocoEnv(BaseEnv):
 
         self.sim = MuJoCoParserClass(self.robot.name, rel_xml_path=robot.xml_path, VERBOSE=verbose)
 
+        self.simulate_steps = getattr(env_config, 'simulate', False)
         self.dt = robot.control_dt
         self.HZ = 1/self.dt
 
@@ -39,7 +40,7 @@ class MujocoEnv(BaseEnv):
         self.base_mats = getattr(self.robot, 'base_pose', None)
         self.num_eef, self.eef_names = self.robot.num_limbs, self.robot.eef_names
 
-        self.sim_joint_names = self.sim.joint_names
+        self.sim_joint_names = self.sim.ctrl_joint_names if self.simulate_steps else self.sim.joint_names
         self.ctrl_joint_idxs, self.mimic_joints_info = self.robot.set_joint_idx_mapping(self.sim_joint_names)
 
         self.render_mode = render_mode
@@ -65,9 +66,7 @@ class MujocoEnv(BaseEnv):
 
     def reset(self):
         self.sim.reset()
-        if 'named_poses' in self.robot.robot_config:
-            named_poses = self.robot.robot_config.named_poses
-            self.set_qpos(named_poses['init'])
+        self.set_qpos(self.robot.init_qpos)
 
         if self.render_mode:
             self.sim.update_viewer(
@@ -88,10 +87,13 @@ class MujocoEnv(BaseEnv):
             new_qpos[self.mimic_joints_info[:, 0].astype(np.int32)] = new_qpos[self.mimic_joints_info[:, 1].astype(np.int32)] * self.mimic_joints_info[:, 2] + self.mimic_joints_info[:, 3]
 
         self.curr_qpos = new_qpos
-        if self.ctrl_mode == 'P':
-            self.set_position_target(new_qpos)
+        if self.simulate_steps:
+            if self.ctrl_mode == 'P':
+                self.set_position_target(new_qpos)
+            else:
+                self.sim.step(ctrl=action, nstep=self.mujoco_nstep)
         else:
-            self.sim.step(ctrl=action, nstep=self.mujoco_nstep)
+            self.set_qpos(action)
         if self.render_mode:
             self.render()
         obs = self.get_observation()
@@ -162,7 +164,6 @@ class MujocoEnv(BaseEnv):
         new_qpos[self.ctrl_joint_idxs] = qpos
         if len(self.mimic_joints_info):
             new_qpos[self.mimic_joints_info[:, 0].astype(np.int32)] = new_qpos[self.mimic_joints_info[:, 1].astype(np.int32)] * self.mimic_joints_info[:, 2] + self.mimic_joints_info[:, 3]
-
         self.curr_qpos = new_qpos
         self.sim.forward(q=new_qpos, INCREASE_TICK=True)
         self.sim.data.qvel[:] = 0.0
@@ -177,9 +178,13 @@ class MujocoEnv(BaseEnv):
         self.sim.plot_T(p=np.zeros(3),R=np.eye(3,3), PLOT_AXIS=True,axis_len=0.5,axis_width=0.005)
         self.sim.plot_T(p=np.array([0,0,0.5]),R=np.eye(3),PLOT_AXIS=False, label='Tick:[%d]'%(self.sim.tick))
         self.sim.plot_joint_axis(axis_len=0.02,axis_r=0.004,joint_names=self.sim_joint_names) # joint axis
-        self.sim.plot_contact_info(h_arrow=0.3,rgba_arrow=[1,0,0,1],PRINT_CONTACT_BODY=False) # contact
+        self.sim.plot_contact_info(h_arrow=0.3,rgba_arrow=[1,0,0,1],PRINT_CONTACT_BODY=True) # contact
         self.sim.render()
-
+        # print(
+        #     f"azimuth: {self.sim.viewer.cam.azimuth}\n"
+        #     f"distance: {self.sim.viewer.cam.distance}\n"
+        #     f"elevation: {self.sim.viewer.cam.elevation}\n"
+        #     f"lookat: {self.sim.viewer.cam.lookat.tolist()}")
 
 
 if __name__ == '__main__':

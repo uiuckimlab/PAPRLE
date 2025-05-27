@@ -1,6 +1,6 @@
 <mujoco model="simple_robot">
-  <include file="../assets/scene/floor_sky.xml" />
-  <compiler angle="radian" meshdir="../"/>
+  <include file="../../assets/scene/floor_sky.xml" />
+  <compiler angle="radian" meshdir="../../"/>
   <asset>
     <mesh name="link1" file="assets/papras/link1.stl" scale="0.001 0.001 0.001"/>
     <mesh name="link2" file="assets/papras/link2.stl" scale="0.001 0.001 0.001"/>
