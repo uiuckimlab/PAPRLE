@@ -16,7 +16,6 @@
 
 - [ ] check power gripper (paprle.hands.power_gripper)
 - [ ] check gripper-trigger joint - make vis better in urdf & xmls
-
 - [ ] Leader reprojection - resolve it with direct_joint_mapping boolean and output_type
 - [ ] Stop when  ik err is too high
 
@@ -24,6 +23,11 @@
 - [ ] organize feedback code in hw interface side
 
 - [ ] add leaders: visionpro
+
+- [ ] ROS1 env
+- [X] ROS2 env
+- [ ] Camera
+- [ ] Data Collection Pipeline
 - [ ] add leaders: offline trajectory
 
 - [ ] add followers: ur5_dual_arm
@@ -33,7 +37,3 @@
 - [ ] add followers: other humanoids
 - [ ] add followers: OMY
 
-- [ ] ROS1 env
-- [ ] ROS2 env
-- [ ] Camera
-- 

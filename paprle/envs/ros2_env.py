@@ -7,13 +7,9 @@ from rclpy.node import Node
 from rclpy.parameter import Parameter, ParameterType
 from rcl_interfaces.srv import GetParameters
 from paprle.envs.base_env import BaseEnv
-from std_msgs.msg import Header
-from sensor_msgs.msg import JointState
-from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from pymoveit2 import MoveIt2, MoveIt2State
+from pymoveit2 import MoveIt2
 import xml.etree.ElementTree as ET
-from functools import partial
-
+from paprle.envs.ros2_env_utils.subscribe_and_publish import JointStateSubscriber, ControllerPublisher
 
 def lp_filter(new_value, prev_value, alpha=0.5):
     if prev_value is None: return new_value
@@ -29,86 +25,6 @@ def calculate_vel(last_qpos, qpos, dt):
         last_qpos = last_qpos.mean(0)
     vel = (qpos - last_qpos) / dt
     return vel
-
-class JointStateSubscriber(Node):
-    def __init__(self, sub_info, output_joint_names):
-        super().__init__('joint_state_subscriber')
-        self.output_joint_names = output_joint_names
-        self.joint_mapping = {}
-        self.sub_info = sub_info
-        self.flag_first_state_updated = {}
-        for sub_topic, sub_info in sub_info.items():
-            sub_msg_type = sub_info['type']
-            self.joint_mapping[sub_topic] = None
-            self.create_subscription(
-                JointState,
-                sub_topic,
-                partial(self.listener_callback, topic=sub_topic),
-                10
-            )
-            self.flag_first_state_updated[sub_topic] = False
-        self.lock = Lock()
-        self.states = {
-            'pos': np.zeros(len(output_joint_names)),
-            'vel': np.zeros(len(output_joint_names)),
-            'eff': np.zeros(len(output_joint_names))
-        }
-
-    def listener_callback(self, msg, topic):
-        if self.joint_mapping[topic] is None:
-            self.joint_mapping[topic] = []
-            for id, name in enumerate(msg.name):
-                if name in self.output_joint_names:
-                    self.joint_mapping[topic].append((id, self.output_joint_names.index(name)))
-            self.joint_mapping[topic] = np.array(self.joint_mapping[topic])
-        with self.lock:
-            id1, id2 = self.joint_mapping[topic][:, 0], self.joint_mapping[topic][:, 1]
-            self.states['pos'][id2] = np.array(msg.position)[id1]
-            self.states['vel'][id2] = np.array(msg.velocity)[id1]
-            self.states['eff'][id2] = np.array(msg.effort)[id1]
-        self.flag_first_state_updated[topic] = True
-
-class ControllerPublisher(Node):
-    def __init__(self, pub_info, command_joint_names, joint_states, timer_period=0.02):
-        super().__init__('controller_publisher')
-        self.timer_period = timer_period
-        self.pub_info = pub_info
-        self.pubs = {}
-        self.command_pos, self.command_vel, self.command_acc = None, None, None
-        self.command_joint_names = command_joint_names
-        self.joint_mapping = {}
-        self.duration_msg = rclpy.duration.Duration(seconds=timer_period).to_msg()
-        self.mode = 'direct_publish' # 'interpolate'
-        self.interpolate_time_ = {}
-        self.interpolate_duration = 3.0
-        self.joint_states = joint_states
-        for pub_topic, pub_info in pub_info.items():
-            pub_msg_type = eval(pub_info['type'])
-            self.joint_mapping[pub_topic] = [command_joint_names.index(name) for name in pub_info['joint_names']]
-            self.pubs[pub_topic] = self.create_publisher(pub_msg_type, pub_topic, 10)
-            self.interpolate_time_[pub_topic] = 0.0
-            self.create_timer(timer_period, partial(self.publish, pub_topic))
-
-    def publish(self, topic):
-        if self.command_pos is not None:
-            msg = JointTrajectory()
-            msg.header = Header()
-            msg.header.stamp = self.get_clock().now().to_msg()
-            msg.joint_names = self.pub_info[topic]['joint_names']
-            mapping_inds = self.joint_mapping[topic]
-            if self.mode == 'direct_publish':
-                pos = self.command_pos[mapping_inds]
-                vel = [] if self.command_vel is None else self.command_vel[mapping_inds]
-                acc = [] if self.command_acc is None else self.command_acc[mapping_inds]
-            else:
-                ratio = min(self.interpolate_time_[topic]/self.interpolate_duration, 1.0)
-                pos = (1-ratio) * self.joint_states['pos'][mapping_inds] + ratio * self.command_pos[mapping_inds]
-                vel = [0.0] * len(mapping_inds)
-                acc = [0.0] * len(mapping_inds)
-                self.interpolate_time_[topic] += self.timer_period
-            msg.points = [JointTrajectoryPoint(positions=pos, velocities=vel, accelerations=acc,
-                                               time_from_start=self.duration_msg)]
-            self.pubs[topic].publish(msg)
 
 # TODO: change use_sim_time param to True if you want to use gazebo
 class ROS2Env(BaseEnv):
@@ -130,7 +46,6 @@ class ROS2Env(BaseEnv):
             self.use_sim_time = use_sim_time_param if isinstance(use_sim_time_param,  bool) else use_sim_time_param.bool_value
         else:
             self.use_sim_time = True
-
 
         # Setup Subscribers and Publishers
         topics_to_sub, topics_to_pub = {}, {}
@@ -157,8 +72,6 @@ class ROS2Env(BaseEnv):
                 topics_to_pub[hand_control_pub_topic] = {'type': limb_info['hand_control_msg_type'], 'joint_names': []}
             topics_to_pub[hand_control_pub_topic]['joint_names'].extend(hand_joint_names)
 
-        self.state_subscriber = JointStateSubscriber(topics_to_sub, robot.joint_names)
-        self.state_subscriber.set_parameters([Parameter('use_sim_time', value=self.use_sim_time)])
         def spin_executor(node, spin_name='', mode='single'):
             from rclpy.executors import SingleThreadedExecutor, MultiThreadedExecutor
             if mode == 'single':
@@ -169,6 +82,12 @@ class ROS2Env(BaseEnv):
             executor.spin()
             print(f"Shutting down {spin_name}")
             return
+        if robot.name == 'g1':
+            from paprle.envs.ros2_env_utils.g1_subscribe_and_publish import JointStateSubscriber as G1JointStateSubscriber
+            self.state_subscriber = G1JointStateSubscriber(topics_to_sub, robot.joint_names)
+        else:
+            self.state_subscriber = JointStateSubscriber(topics_to_sub, robot.joint_names)
+        self.state_subscriber.set_parameters([Parameter('use_sim_time', value=self.use_sim_time)])
         self.sub_thread = Thread(target=spin_executor, args=(self.state_subscriber,"Subscriber Thread"))
         self.sub_thread.start()
 
@@ -183,12 +102,14 @@ class ROS2Env(BaseEnv):
         self.command_lock = Lock()
         self.last_command, self.lp_filter_alpha = None, self.robot.ros2_config.lp_filter_alpha
         self.last_vel, self.dt = None, self.robot.control_dt
-        self.controller_publisher = ControllerPublisher(topics_to_pub, robot.joint_names, self.state_subscriber.states)
+        if robot.name == 'g1':
+            from paprle.envs.ros2_env_utils.g1_subscribe_and_publish import ControllerPublisher as G1ControllerPublisher
+            self.controller_publisher = G1ControllerPublisher(topics_to_pub, robot.joint_names, self.state_subscriber.states)
+        else:
+            self.controller_publisher = ControllerPublisher(topics_to_pub, robot.joint_names, self.state_subscriber.states)
         self.controller_publisher.set_parameters([Parameter('use_sim_time', value=self.use_sim_time)])
         self.pub_thread = Thread(target=spin_executor, args=(self.controller_publisher,"Publisher Thread",'multi'))
         self.pub_thread.start()
-
-
 
     def setup_get_move_group_params(self):
         self.get_param_cli = self.moveit_node.create_client(GetParameters, '/move_group/get_parameters')
