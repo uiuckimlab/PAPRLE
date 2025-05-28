@@ -8,23 +8,11 @@ import warnings
 from configs import BaseConfig
 follower_config, leader_config, env_config = BaseConfig().parse()
 
-# Import order is important , don't know fancy way to do this
-if env_config.name == "ros":
-    sys.path.append("/usr/lib/python3/dist-packages")
-    sys.path.append("/opt/ros/noetic/lib/python3.8/site-packages/")
-    import rospy
-    import moveit_commander
-    import pinocchio
-elif env_config.name == "ros2":
-    import rclpy
-elif env_config.name == "isaacgym":
-    import isaacgym # this needs to be imported before torch
-
 from paprle.teleoperator import Teleoperator
 from paprle.follower import Robot
 from paprle.leaders import LEADERS_DICT
 from paprle.envs import ENV_DICT
-#from src.feedback.feedback import Feedback
+from paprle.feedback import Feedback
 from threading import Thread
 
 TIME_DEBUG = False
@@ -39,9 +27,10 @@ class Runner:
         self.env = ENV_DICT[env_config.name](self.robot, device_config, env_config, render_mode='human', leader=self.leader) # Actually send joint positions to the robot.
         self.env.vis_info = self.leader.update_vis_info(self.env.vis_info)
 
-        # self.feedback = Feedback(self.leader, self.teleop, self.env, robot_config, device_config)
-        # self.feedback_thread = Thread(target=self.feedback.send_feedback)
-        # self.feedback_thread.start()
+        if not env_config.off_feedback:
+            self.feedback = Feedback(self.robot, self.leader, self.teleop, self.env)
+            self.feedback_thread = Thread(target=self.feedback.send_feedback)
+            self.feedback_thread.start()
 
         self.shutdown = False
         signal.signal(signal.SIGINT, self.shutdown_handler)

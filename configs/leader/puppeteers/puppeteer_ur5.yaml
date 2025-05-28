@@ -1,5 +1,5 @@
 type: puppeteer
-name: puppeteer_papras_6dof
+name: puppeteer_ur5
 
 teleop_dt: 0.02
 output_type: joint_pos # 'joint_pos' or 'delta_eef_pose'
@@ -18,24 +18,23 @@ end_effector_link:
 hand_joint_names:
   robot1: ['robot1/gripper']
 
-init_qpos: [0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0]
+init_qpos: [0.0, 0.46, 1.55, 2.55, -3, -1.7, 0.0]
 
 # leader limb -> follower limb
 direct_mapping: # default is empty, which means 1:1 mapping
   robot1: 'robot1'
 
-reset_pose: [[-0.153, -0.016, 0.374]] # eef pose regarding world frame
-reset_cube: [0.200, 0.100, 0.050] # half cube size of reset region
+reset_pose: [[0.151, 0.288, 0.420]]
+reset_cube: [0.200, 0.100, 0.050]
 
 asset_cfg:
   asset_dir: 'models/'
-  urdf_path: 'models/leaders/papras_6dof_leader.urdf'
-  xml_path: 'models/leaders/papras_6dof_leader.xml'
+  urdf_path: 'models/leaders/ur5_leader.urdf'
+  xml_path: 'models/leaders/ur5_leader.urdf'
 
 direct_mapping_available_robots: ['papras_6dof']
 hand_limits: # for gripper range mapping
-  robot1/gripper: [-2.0, -1.0] #[-0.39, 0.56]
-
+  robot1/gripper: [-0.35, 0.57]
 
 render_base: 'trimesh'
 viewer_args:

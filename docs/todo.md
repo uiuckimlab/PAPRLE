@@ -13,6 +13,10 @@
 - [x] add followers: papras_6dof_dual_arm
 - [x] IsaacGym
 - [x] Make better import of pinocchio (paprle.ik.pinocchio)
+- [x] add followers: papras_stand
+- [x] add followers: papras_orthrus
+- [x] add followers: papras_kitchen
+- [X] ROS2 env
 
 - [ ] check power gripper (paprle.hands.power_gripper)
 - [ ] check gripper-trigger joint - make vis better in urdf & xmls
@@ -25,14 +29,13 @@
 - [ ] add leaders: visionpro
 
 - [ ] ROS1 env
-- [X] ROS2 env
+
 - [ ] Camera
 - [ ] Data Collection Pipeline
 - [ ] add leaders: offline trajectory
 
 - [ ] add followers: ur5_dual_arm
-- [ ] add followers: papras_stand
-- [ ] add followers: papras_orthrus
+
 - [ ] add followers: g1
 - [ ] add followers: other humanoids
 - [ ] add followers: OMY

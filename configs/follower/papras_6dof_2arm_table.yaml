@@ -18,9 +18,7 @@ robot_cfg:
   end_effector_link:
     robot3: 'robot3/end_effector_link'
     robot4: 'robot4/end_effector_link'
-  named_poses:
-    #TODO: maybe read this info from srdf file, but conditionally. If not found, use this info
-    init: [0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0,
+  init_qpos: [0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0,
            0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0,]
   viewer_args:
     mujoco:

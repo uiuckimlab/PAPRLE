@@ -115,11 +115,13 @@ class Puppeteer:
         self.hand_offsets, self.hand_scales, self.hand_ids = [], [], []
         for leader_limb_name, leader_hand_joint_idxs in self.leader_robot.ctrl_hand_joint_idx_mapping.items():
             follower_min_val, follower_max_val = 0.0, 1.0
-            gripper_min_val, gripper_max_val = self.leader_config.hand_limits[leader_limb_name]
-            scale = (follower_max_val - follower_min_val) / (gripper_max_val - gripper_min_val)
-            offset = follower_min_val - gripper_min_val * scale
-            self.hand_offsets.append(offset)
-            self.hand_scales.append(scale)
+            for hand_id in leader_hand_joint_idxs:
+                hand_name = self.leader_robot.joint_names[hand_id]
+                gripper_min_val, gripper_max_val = self.leader_config.hand_limits[hand_name]
+                scale = (follower_max_val - follower_min_val) / (gripper_max_val - gripper_min_val)
+                offset = follower_min_val - gripper_min_val * scale
+                self.hand_offsets.append(offset)
+                self.hand_scales.append(scale)
             self.hand_ids.extend(leader_hand_joint_idxs)
 
         self.topic_joint_names, self.topic_joint_mapping = [], []
@@ -150,6 +152,7 @@ class Puppeteer:
         self.leader_viz_info = {'color': 'blue',  'log': "Puppeteer is ready!"}
         self.end_detection_thread = Thread(target=self.detect_end_signal)
         self.end_detection_thread.start()
+        time.sleep(1.0)
         return
 
     def joint_state_callback(self, msg):

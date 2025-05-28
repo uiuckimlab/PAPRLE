@@ -13,6 +13,7 @@ from dualsense_controller.core.hidapi.hidapi import Device, enumerate
 # https://github.com/tocoteron/joycon-python
 class JoyConFixed(JoyCon):
     def __init__(self, vendor_id: int, product_id: int, serial: str = None, simple_mode=False, device_info=None):
+        self.leader_config = leader_config
         if vendor_id != JOYCON_VENDOR_ID:
             raise ValueError(f'vendor_id is invalid: {vendor_id!r}')
 

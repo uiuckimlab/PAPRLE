@@ -21,9 +21,7 @@ hand_joint_names:
   robot1: ['robot1/gripper']
   robot2: ['robot2/gripper']
 
-named_poses:
-  #TODO: maybe read this info from srdf file, but conditionally. If not found, use this info
-  init: [0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0, 0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0]
+init_qpos: [0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0, 0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0]
 
 # leader limb -> follower limb
 direct_mapping: # default is empty, which means 1:1 mapping
@@ -40,8 +38,8 @@ asset_cfg:
 
 direct_mapping_available_robots: ['papras_6dof_2arm_table']
 hand_limits: # for gripper range mapping
-  robot1/gripper: [-1.99, -1.0]
-  robot2/gripper: [-1.99, -1.0]
+  robot1/gripper: [[-1.99, -1.0]]
+  robot2/gripper: [[-1.99, -1.0]]
 
 render_base: 'trimesh'
 viewer_args:

@@ -7,6 +7,7 @@ import copy
 
 class KeyboardController:
     def __init__(self, robot, leader_config, env_config, render_mode='human', verbose=False, *args, **kwargs):
+        self.leader_config = leader_config
         self.is_ready = False
         self.require_end = False
         self.shutdown = False

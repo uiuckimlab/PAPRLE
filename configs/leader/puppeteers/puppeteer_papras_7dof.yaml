@@ -18,9 +18,7 @@ end_effector_link:
 hand_joint_names:
   robot1: ['robot1/gripper']
 
-named_poses:
-  #TODO: maybe read this info from srdf file, but conditionally. If not found, use this info
-  init: [0.0, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0]
+init_qpos: [0.0, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0]
 
 # leader limb -> follower limb
 direct_mapping: # default is empty, which means 1:1 mapping
@@ -30,8 +28,6 @@ direct_mapping: # default is empty, which means 1:1 mapping
 reset_pose: [[-0.153, -0.016, 0.374]]
 reset_cube: [0.200, 0.100, 0.050]
 
-
-# for gello
 asset_cfg:
   asset_dir: 'models/'
   urdf_path: 'models/leaders/papras_7dof_leader.urdf'
@@ -39,7 +35,7 @@ asset_cfg:
 
 direct_mapping_available_robots: ['papras_7dof']
 hand_limits: # for gripper range mapping
-  robot1/gripper: [-2.0, -1.0] #[-0.39, 0.56]
+  robot1/gripper: [[-2.0, -1.0]] #[-0.39, 0.56]
 
 render_base: 'trimesh'
 viewer_args:

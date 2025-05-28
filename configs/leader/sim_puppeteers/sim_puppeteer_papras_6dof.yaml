@@ -17,9 +17,7 @@ end_effector_link:
 hand_joint_names:
   robot1: ['robot1/gripper']
 
-named_poses:
-  #TODO: maybe read this info from srdf file, but conditionally. If not found, use this info
-  init: [0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0]
+init_qpos: [0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0]
 
 # leader limb -> follower limb
 direct_mapping: # default is empty, which means 1:1 mapping

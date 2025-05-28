@@ -15,6 +15,7 @@ from yourdfpy.urdf import URDF
 class IsaacGymEnv:
     def __init__(self, robot, device_config, env_config, verbose=False, render_mode='', **kwargs):
 
+        self.robot = robot
         self.robot_config = robot.robot_config
         self.urdf_file = robot.urdf_file
         self.gym = gymapi.acquire_gym()
@@ -104,7 +105,6 @@ class IsaacGymEnv:
                 self.mimic_joints_info.append(mimic_info)
         self.mimic_joints_info = np.array(self.mimic_joints_info)
 
-        #self.init_qpos  = self.robot_config.named_poses.ready
         all_qpos = np.zeros(self.num_dof)
         #all_qpos[self.idx_mappings] = self.init_qpos
         if len(self.mimic_joints_info):
@@ -117,9 +117,7 @@ class IsaacGymEnv:
 
     def reset(self, ):
         all_qpos = np.zeros(self.num_dof)
-        if 'named_poses' in self.robot_config:
-            named_poses = self.robot_config.named_poses
-            all_qpos[self.idx_mappings] = named_poses['init']
+        all_qpos[self.idx_mappings] = np.array(self.robot.init_qpos)
         if len(self.mimic_joints_info):
             all_qpos[self.mimic_joints_info[:, 0].astype(np.int32)] = all_qpos[self.mimic_joints_info[:, 1].astype(np.int32)] * self.mimic_joints_info[:, 2] + self.mimic_joints_info[:, 3]
         dof_states = self.gym.get_actor_dof_states(self.env, self.actor, gymapi.STATE_ALL)

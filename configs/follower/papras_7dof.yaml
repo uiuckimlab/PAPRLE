@@ -15,9 +15,7 @@ robot_cfg:
   max_joint_vel: 2.0 # Maximum joint velocity
   end_effector_link:
     robot1: 'robot1/end_effector_link'
-  named_poses:
-    #TODO: maybe read this info from srdf file, but conditionally. If not found, use this info
-    init: [0.0, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0]
+  init_qpos: [0.0, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0]
   viewer_args:
     mujoco:
 #      azimuth: 26.675000000000097

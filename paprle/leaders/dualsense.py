@@ -9,6 +9,7 @@ import copy
 # https://github.com/yesbotics/dualsense-controller-python
 class DualSense:
     def __init__(self, robot, leader_config, *args, **kwargs):
+        self.leader_config = leader_config
         self.num_limbs = robot.num_limbs
         self.follower_limb_names = robot.limb_names
 
