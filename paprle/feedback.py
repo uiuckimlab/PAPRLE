@@ -23,11 +23,22 @@ class Feedback():
         self.teleoperator = teleoperator
         self.env = env
 
+        self.follower_hand_inds  = []
+        for limb_name in self.robot.limb_names:
+            if limb_name in self.robot.ctrl_hand_joint_idx_mapping:
+                self.follower_hand_inds.extend(self.robot.ctrl_hand_joint_idx_mapping[limb_name])
+
+
         self.use_ros = False
         if leader.leader_config.type == 'puppeteer':
             self.use_ros = True
             self.leader_joint_names = leader.leader_robot.joint_names
             self.follower_joint_names = robot.joint_names
+            self.joint_reach_eps = 0.5
+            self.joint_max_th = self.robot.joint_limits[:,1] - self.joint_reach_eps
+            self.joint_min_th = self.robot.joint_limits[:,0] + self.joint_reach_eps
+            self.joint_limit_feedback_enabled = np.ones(len(self.leader_joint_names), dtype=bool)
+            self.joint_limit_feedback_enabled[leader.hand_ids] = False  # disable hand joints feedback
 
             if ROS_VERSION == 'ROS1':
                 rospy.init_node('feedback_node', anonymous=True)
@@ -85,22 +96,22 @@ class Feedback():
                     joint_limit_reaching_feedback[exceed_max < 0] = exceed_max[exceed_max < 0]  # minus signal to reduce the joint position
                     exceed_min = self.joint_min_th - qpos
                     joint_limit_reaching_feedback[exceed_min > 0] = exceed_min[exceed_min > 0]  # plus signal to increase the joint position
-                    joint_limit_reaching_feedback = joint_limit_reaching_feedback
+                    joint_limit_reaching_feedback = joint_limit_reaching_feedback * self.joint_limit_feedback_enabled
 
                     leader_command = self.leader.last_command
                     if leader_command is not None:
                         # scale leader_command first
-                        follower_qpos = self.follower.get_state_as_command()
-                        leader_qpos, hand_inds = get_joint_pos_as_command(self.robot_config.robot_cfg, leader_command,return_hand_inds=True)
+                        follower_qpos = self.env.get_current_qpos()
+                        leader_qpos  = leader_command
                         # leader_qpos[hand_inds] = (leader_qpos[hand_inds] - self.leader.hand_offsets)/self.leader.hand_scales
                         not_following_feedback = follower_qpos - leader_qpos
-                        not_following_feedback[hand_inds] = np.clip(not_following_feedback[hand_inds], -0.5, 0.0)
+                        not_following_feedback[self.leader.hand_inds] = np.clip(not_following_feedback[self.leader.hand_inds], -0.5, 0.0)
                     else:
                         not_following_feedback = np.zeros(len(qpos))
 
                     msg = JointState()
                     msg.header.stamp = self.node.get_clock().now().to_msg()
-                    msg.name = self.joint_names
+                    msg.name = self.leader_joint_names
                     msg.position = joint_limit_reaching_feedback.tolist()
                     self.pub_joint_limits.publish(msg)
 
@@ -128,13 +139,13 @@ class Feedback():
                     # calculate eef pose feedback - leader will solve ik for the joint positions
                     # 1. Get current
                     joint_limit_reaching_feedback = np.zeros(len(qpos))
-                    follower_qpos = self.follower.get_state_as_command()
+                    follower_qpos = self.env.get_current_qpos()
                     msg = None
                     if self.teleoperator.target_ee_poses is not None:
                         msg = EEFTransforms()
-                        for limb_name in self.teleoperator.follower_limb_names:
+                        for limb_name in self.robot.limb_names:
                             pin_solver = self.teleoperator.ik_solvers[limb_name]
-                            arm_qpos = follower_qpos[self.robot_config.robot_cfg.ctrl_arm_joint_idx_mapping[limb_name]]
+                            arm_qpos = follower_qpos[self.robot.robot_config.ctrl_arm_joint_idx_mapping[limb_name]]
                             pin_qpos = pin.neutral(pin_solver.model)
                             pin_qpos[pin_solver.idx_mapping] = arm_qpos
                             pin.forwardKinematics(pin_solver.model, pin_solver.data, pin_qpos)
@@ -155,15 +166,15 @@ class Feedback():
                             msg.frame_names.append(limb_name)
                         msg.header.stamp = self.node.get_clock().now().to_msg()
 
-                        gripper_feedback = np.zeros(len(self.leader.leader_joint_names))
+                        gripper_feedback = np.zeros(len(self.leader_joint_names))
                         follower_hand_pos = follower_qpos[self.follower_hand_inds]
-                        leader_hand_pos = self.leader.positions[self.leader.hand_inds]
+                        leader_hand_pos = self.leader.leader_states[self.leader.hand_ids]
                         diff = ((follower_hand_pos - leader_hand_pos)) / self.leader.hand_scales
                         diff = np.clip(diff, -0.5, 0.0)
-                        gripper_feedback[self.leader.hand_inds] = diff.flatten()
+                        gripper_feedback[self.leader.hand_ids] = diff.flatten()
                         gripper_msg = JointState()
                         gripper_msg.header.stamp = self.node.get_clock().now().to_msg()
-                        gripper_msg.name = self.leader.leader_joint_names
+                        gripper_msg.name = self.leader_joint_names
                         gripper_msg.position = gripper_feedback.tolist()
                         self.pub_joint.publish(gripper_msg)
 

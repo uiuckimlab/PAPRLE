@@ -125,6 +125,7 @@ class IsaacGymEnv:
         self.gym.set_actor_dof_states(self.env, self.actor, dof_states, gymapi.STATE_ALL)
         return
 
+
     def initialize(self, initialize_qpos=None):
         self.init_qpos  = initialize_qpos
         all_qpos = np.zeros(self.num_dof)
@@ -186,6 +187,10 @@ class IsaacGymEnv:
         self.simulate()
         if self.render_mode:
             self.render(sync_frame_time=sync_frame_time)
+        self.curr_qpos = all_qpos
+
+    def get_current_qpos(self):
+        return np.array(self.curr_qpos)
 
     def get_curr_viewer_camera_setting(self):
         transform = self.gym.get_viewer_camera_transform(self.viewer, self.env)

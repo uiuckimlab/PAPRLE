@@ -23,8 +23,8 @@ class BaseConfig:
         parser.add_argument('--render-teleop', action='store_true', default=False)
         parser.add_argument('--render-env', action='store_true', default=False)
 
-        parser.add_argument('--off-collision', type=str2bool, default=False)
-        parser.add_argument('--off-feedback', type=str2bool, default=False)
+        parser.add_argument('--off-collision', action='store_true', default=False)
+        parser.add_argument('--off-feedback', action='store_true', default=False)
 
         leader_list = os.listdir('configs/leader') + os.listdir('configs/leader/puppeteers/') + os.listdir('configs/leader/sim_puppeteers/')
         # Help

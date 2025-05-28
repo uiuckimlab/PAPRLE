@@ -46,7 +46,7 @@ class ROS2Env(BaseEnv):
             self.use_sim_time = use_sim_time_param if isinstance(use_sim_time_param,  bool) else use_sim_time_param.bool_value
         else:
             self.use_sim_time = True
-
+        self.use_sim_time = False
         # Setup Subscribers and Publishers
         topics_to_sub, topics_to_pub = {}, {}
         for limb_name, limb_info in robot.ros2_config.robots.items():
@@ -286,7 +286,12 @@ class ROS2Env(BaseEnv):
             self.controller_publisher.command_pos = pos
             self.controller_publisher.command_vel = vel
             self.controller_publisher.command_acc = acc
-        return 
+        self.last_command = pos
+        return
+
+    def get_current_qpos(self):
+        return np.array(self.state_subscriber.states['pos'].copy())
+
 
 
 

@@ -18,10 +18,6 @@ robot_cfg:
   init_qpos: [0.0, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0]
   viewer_args:
     mujoco:
-#      azimuth: 26.675000000000097
-#      distance: 1.5335979275831788
-#      elevation: -20.22500000000002
-#      lookat: [ -0.20412881,  0.01636384,  0.28888699 ]
       azimuth: 52.325000000000145
       distance: 1.5335979275831788
       elevation: -12.125000000000004
@@ -51,3 +47,28 @@ ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
     eps: 1e-2
     base_link: robot1/link1 # base_link in the original urdf file,not the base_link in the ik model
 
+ros2_cfg:
+  lp_filter_alpha: 0.9
+  motion_planning: 'moveit' # moveit or interpolation
+  moveit:
+    namespace: ''
+    arm_group_name: 'arm1'
+    hand_group_name: 'gripper1'
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: True
+  state_sub_topic: '/joint_states' # Topic to subscribe for joint states
+  state_sub_msg_type: 'sensor_msgs/msg/JointState' # Message type for joint states
+  robots:
+    robot1:
+      arm_control_topic: '/arm1_controller/joint_trajectory'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/gripper1_controller/joint_trajectory'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+  cameras: []

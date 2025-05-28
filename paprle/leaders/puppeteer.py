@@ -152,7 +152,7 @@ class Puppeteer:
         self.leader_viz_info = {'color': 'blue',  'log': "Puppeteer is ready!"}
         self.end_detection_thread = Thread(target=self.detect_end_signal)
         self.end_detection_thread.start()
-        time.sleep(1.0)
+        time.sleep(3.0)
         return
 
     def joint_state_callback(self, msg):
@@ -179,7 +179,7 @@ class Puppeteer:
             start_time = time.time()
             self.leader_viz_info['color'] = 'green'
             with self.pos_lock:
-                positions = self.leader_states[self.hand_ids].copy()
+                positions = self.leader_states.copy()
                 
             hand_closed = (positions[self.hand_ids] > gripper_th).all()
             
@@ -195,11 +195,11 @@ class Puppeteer:
             if not self.require_end and hand_closed and wrist_up:
                 enough_to_end += dt
                 self.leader_viz_info['color'] = (enough_to_end * 255 / threshold_time, 255 - enough_to_end * 255 / threshold_time, 0)
-                self.leader_viz_info['log'] = f"Running... End signal detected! {enough_to_end:.2f}/{threshold_time:d}"
-                print(f"Running... End signal detected! {enough_to_end:.2f}/{threshold_time:d}", end="\r")
+                self.leader_viz_info['log'] = f"Running... End signal detected! {enough_to_end:.2f}/{threshold_time:.2f}"
+                print(f"Running... End signal detected! {enough_to_end:.2f}/{threshold_time:.2f}", end="\r")
             else:
                 if enough_to_end > 0.0:
-                    print(f"Running... End signal detected! 0.0/{threshold_time:d}", end="\r")
+                    print(f"Running... End signal detected! 0.0/{threshold_time:.2f}", end="\r")
                 enough_to_end = 0.0
             
             if enough_to_end >= threshold_time:
@@ -326,7 +326,7 @@ class Puppeteer:
         self.leader_viz_info['color'] = 'red'
         self.leader_viz_info['log'] = 'Initializing the controller...'
 
-        curr_pose = self.leader_states[arm_inds].copy()
+        curr_pose = self.leader_states.copy()
         if not self.direct_joint_mapping:
             init_env_qpos = curr_pose
             if self.motion_mapping_method in ['direct_scaling', 'leader_reprojection']:
@@ -355,8 +355,7 @@ class Puppeteer:
         return
 
     def get_status(self):
-        self.sliders.update()
-        q_from_sliders = self.sliders.get_slider_values()
+        q_from_sliders = self.leader_states
         self.last_qpos = q_from_sliders
         if self.output_type == 'delta_eef_pose':
             if self.motion_mapping_method == 'direct_scaling':

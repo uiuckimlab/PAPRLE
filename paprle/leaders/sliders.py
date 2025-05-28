@@ -9,7 +9,7 @@ from pytransform3d import transformations as pt
 # Only supports direct joint mapping
 class Sliders:
     def __init__(self, robot, leader_config, env_config, render_mode='none', verbose=False, *args, **kwargs):
-
+        self.leader_config = leader_config
         self.robot = robot
         self.is_ready = False
         self.require_end = False

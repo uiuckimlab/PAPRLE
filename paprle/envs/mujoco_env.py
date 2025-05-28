@@ -186,6 +186,8 @@ class MujocoEnv(BaseEnv):
         #     f"elevation: {self.sim.viewer.cam.elevation}\n"
         #     f"lookat: {self.sim.viewer.cam.lookat.tolist()}")
 
+    def get_current_qpos(self):
+        return np.array(self.curr_qpos)
 
 if __name__ == '__main__':
     from configs import BaseConfig
