@@ -1,3 +1,32 @@
+Metadata-Version: 2.1
+Name: paprle
+Version: 0.1.0
+Summary: PAPRLE: Plug-and-Play Robotic Limb Environment
+Author-email: Obin Kwon <obin.kwon000@gmail.com>
+License: MIT
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: numpy==1.23
+Requires-Dist: omegaconf
+Requires-Dist: opencv-python
+Requires-Dist: matplotlib
+Requires-Dist: pytransform3d
+Requires-Dist: yourdfpy
+Requires-Dist: pyglet<2
+Requires-Dist: tk
+Requires-Dist: termcolor
+Requires-Dist: getch
+Requires-Dist: joblib
+Requires-Dist: seaborn
+Requires-Dist: mujoco==3.1.6
+Requires-Dist: mujoco_python_viewer==0.1.4
+Provides-Extra: joycon
+Requires-Dist: joycon-python; extra == "joycon"
+Requires-Dist: hidapi; extra == "joycon"
+Requires-Dist: pyglm; extra == "joycon"
+Provides-Extra: g1
+Requires-Dist: unitree_sdk2py; extra == "g1"
+
 # PAPRLE (Plug-And-Play Robotic Limb Environment)
 ## Table of Contents
 - [Overview](#overview)

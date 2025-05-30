@@ -1,8 +1,8 @@
 
 ## Installation
 **Recommended Environment**
-- Ubuntu 20.04 or Ubuntu 22.04
-- python 3.8 or 3.10
+- Ubuntu 20.04, python 3.8
+- Ubuntu 22.04, python 3.10
 
 **1. Clone the repository**
 
@@ -24,9 +24,18 @@ conda activate <env_name>
 ```
 
 **3. Install**
+
 ```bash
 pip install -e .
 ```
+
+## Hardware
+
+For hardware setup, please refer to
+
+PAPRAS Interface: https://github.com/uiuckimlab/PAPRAS-V0-Public/
+
+PAPRAS Models + PAPRLE Leaders: https://github.com/uiuckimlab/PAPRLE_hw
 
 
 

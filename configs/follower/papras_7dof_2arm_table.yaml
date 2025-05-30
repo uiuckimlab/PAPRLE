@@ -64,9 +64,9 @@ ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
 
 ros2_cfg:
   lp_filter_alpha: 0.9
-  motion_planning: 'interpolate' # moveit or interpolation
+  motion_planning: 'moveit' # moveit or interpolation
   moveit:
-    namespace: 'followers'
+    namespace: '/followers'
     arm_group_name: 'arm34'
     hand_group_name: 'gripper34'
     num_planning_attempts: 30
@@ -74,22 +74,22 @@ ros2_cfg:
     max_velocity_scaling_factor: 0.1
     max_acceleration_scaling_factor: 0.1
     use_move_group_action: True
-  state_sub_topic: '/joint_states' # Topic to subscribe for joint states
+  state_sub_topic: '/followers/joint_states' # Topic to subscribe for joint states
   state_sub_msg_type: 'sensor_msgs/msg/JointState' # Message type for joint states
   robots:
     robot3:
-      arm_control_topic: '/arm3_controller/joint_trajectory'
+      arm_control_topic: '/followers/arm3_controller/command'
       arm_control_msg_type: 'JointTrajectory'
-      hand_control_topic: '/gripper3_controller/joint_trajectory'
+      hand_control_topic: '/followers/gripper3_controller/command'
       hand_control_msg_type: 'JointTrajectory'
       arm_state_sub_topic: ${...state_sub_topic}
       hand_state_sub_topic: ${...state_sub_topic}
       arm_state_sub_msg_type: ${...state_sub_msg_type}
       hand_state_sub_msg_type: ${...state_sub_msg_type}
     robot4:
-      arm_control_topic: '/arm4_controller/joint_trajectory'
+      arm_control_topic: '/followers/arm4_controller/command'
       arm_control_msg_type: 'JointTrajectory'
-      hand_control_topic: '/gripper4_controller/joint_trajectory'
+      hand_control_topic: '/followers/gripper4_controller/command'
       hand_control_msg_type: 'JointTrajectory'
       arm_state_sub_topic: ${...state_sub_topic}
       hand_state_sub_topic: ${...state_sub_topic}

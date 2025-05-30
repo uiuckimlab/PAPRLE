@@ -46,6 +46,8 @@ def import_pinocchio():
             if 'humble' in p:
                 sys.path.remove(p)
                 removed_p.append(p)
+        sys.path.append("/usr/lib/python3/dist-packages")
+        sys.path.append("/opt/ros/noetic/lib/python3.8/site-packages/")
 
     try:
         import pinocchio as pin
