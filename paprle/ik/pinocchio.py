@@ -77,9 +77,6 @@ class PinocchioIKSolver(BaseIKSolver):
         qpos = self.qpos.copy()
         candidates = []
         for r in range(self.repeat):
-            if r > 0:
-                qpos = pin.neutral(self.model)
-
             for k in range(30):
                 pin.forwardKinematics(self.model, self.data, qpos)
                 ee_pose = pin.updateFramePlacement(self.model, self.data, self.ee_frame_id)

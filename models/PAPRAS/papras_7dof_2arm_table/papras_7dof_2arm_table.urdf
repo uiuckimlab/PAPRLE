@@ -473,6 +473,7 @@
       <!--<inertia ixx="0.00000938" ixy="0.0" ixz="0.0" iyy="0.00000338" iyz="0.0" izz="0.00000635" />-->
     </inertial>
   </link>
+  
   <gazebo reference="robot3/end_link">
     <kp>1000000.0</kp>
     <kd>100.0</kd>
@@ -484,6 +485,13 @@
     <selfCollide>1</selfCollide>
     <dampingFactor>0.01</dampingFactor>
   </gazebo>
+  <link name="robot3/wrist_link">
+  </link>
+  <joint name="robot3/wrist_joint" type="fixed">
+    <parent link="robot3/end_link"/>
+    <child link="robot3/wrist_link"/>
+    <origin rpy="0 0 0" xyz="0.006 0.0 0.0"/>
+  </joint>
   <!-- gripper main fixed joint-->
   <joint name="robot3/end_link_fixed" type="fixed">
     <parent link="robot3/end_link"/>
@@ -1198,6 +1206,13 @@
     <selfCollide>1</selfCollide>
     <dampingFactor>0.01</dampingFactor>
   </gazebo>
+  <link name="robot4/wrist_link">
+  </link>
+  <joint name="robot4/wrist_joint" type="fixed">
+    <parent link="robot4/end_link"/>
+    <child link="robot4/wrist_link"/>
+    <origin rpy="0 0 0" xyz="0.006 0.0 0.0"/>
+  </joint>
   <!-- gripper main fixed joint-->
   <joint name="robot4/end_link_fixed" type="fixed">
     <parent link="robot4/end_link"/>

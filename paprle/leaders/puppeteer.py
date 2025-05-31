@@ -152,7 +152,7 @@ class Puppeteer:
         self.leader_viz_info = {'color': 'blue',  'log': "Puppeteer is ready!"}
         self.end_detection_thread = Thread(target=self.detect_end_signal)
         self.end_detection_thread.start()
-        time.sleep(3.0)
+        #time.sleep(3.0)
         return
 
     def joint_state_callback(self, msg):
@@ -324,7 +324,7 @@ class Puppeteer:
 
         print("[Puppeteer] Gripper closed. Initializing the leader...")
         self.leader_viz_info['color'] = 'red'
-        self.leader_viz_info['log'] = 'Initializing the controller...'
+        self.leader_viz_info['log'] = 'Initializing Leader...'
 
         curr_pose = self.leader_states.copy()
         if not self.direct_joint_mapping:

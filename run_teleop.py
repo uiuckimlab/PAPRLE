@@ -23,8 +23,8 @@ class Runner:
         self.TELEOP_DT = robot_config.robot_cfg.teleop_dt = device_config.teleop_dt
         self.robot = Robot(robot_config)
         self.leader = LEADERS_DICT[device_config.type](self.robot, device_config, env_config, render_mode='human') # Get signals from teleop devices, outputs joint positions or eef poses as teleop commands.
-        self.teleop = Teleoperator(self.robot, device_config, env_config, render_mode='') # Solving IK for joint positions if not already given, check collision, and output proper joint positions.
-        self.env = ENV_DICT[env_config.name](self.robot, device_config, env_config, render_mode='human', leader=self.leader) # Actually send joint positions to the robot.
+        self.teleop = Teleoperator(self.robot, device_config, env_config, render_mode='mujoco') # Solving IK for joint positions if not already given, check collision, and output proper joint positions.
+        self.env = ENV_DICT[env_config.name](self.robot, device_config, env_config, render_mode='', leader=self.leader) # Actually send joint positions to the robot.
         self.env.vis_info = self.leader.update_vis_info(self.env.vis_info)
 
         if not env_config.off_feedback:
@@ -75,7 +75,8 @@ class Runner:
         return
     def run(self):
 
-        init_env_qpos = self.env.reset() # Move the robot to the default positionm
+        init_env_qpos = self.env.reset() # Move the robot to the default position
+        self.teleop.reset(init_env_qpos)
         shutdown = self.leader.launch_init(init_env_qpos) # Wait in the initialize function until the leader is ready (for visionpro and gello)
         if shutdown: return
         while not self.leader.is_ready:
@@ -108,7 +109,7 @@ class Runner:
             if self.leader.require_end or self.reset:
                 self.reset = False
                 init_env_qpos = self.env.reset()
-                self.teleop.reset()
+                self.teleop.reset(init_env_qpos)
                 shutdown = self.leader.launch_init(init_env_qpos)  # Wait in the initialize function until the leader is ready (for visionpro and gello)
                 if shutdown: return
                 while not self.leader.is_ready:

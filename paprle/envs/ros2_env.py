@@ -4,12 +4,13 @@ import time
 import copy
 from threading import Thread, Lock
 from rclpy.node import Node
-from rclpy.parameter import Parameter, ParameterType
+
 from rcl_interfaces.srv import GetParameters
 from paprle.envs.base_env import BaseEnv
 from pymoveit2 import MoveIt2
 import xml.etree.ElementTree as ET
 from paprle.envs.ros2_env_utils.subscribe_and_publish import JointStateSubscriber, ControllerPublisher
+
 
 def lp_filter(new_value, prev_value, alpha=0.5):
     if prev_value is None: return new_value
@@ -42,11 +43,6 @@ class ROS2Env(BaseEnv):
             self.get_param_cli = None
             self.setup_moveit()
 
-            use_sim_time_param = self.get_move_group_params('use_sim_time')
-            self.use_sim_time = use_sim_time_param if isinstance(use_sim_time_param,  bool) else use_sim_time_param.bool_value
-        else:
-            self.use_sim_time = True
-        self.use_sim_time = False
         # Setup Subscribers and Publishers
         topics_to_sub, topics_to_pub = {}, {}
         for limb_name, limb_info in robot.ros2_config.robots.items():
@@ -87,7 +83,6 @@ class ROS2Env(BaseEnv):
             self.state_subscriber = G1JointStateSubscriber(topics_to_sub, robot.joint_names)
         else:
             self.state_subscriber = JointStateSubscriber(topics_to_sub, robot.joint_names)
-        self.state_subscriber.set_parameters([Parameter('use_sim_time', value=self.use_sim_time)])
         self.sub_thread = Thread(target=spin_executor, args=(self.state_subscriber,"Subscriber Thread"))
         self.sub_thread.start()
 
@@ -107,12 +102,12 @@ class ROS2Env(BaseEnv):
             self.controller_publisher = G1ControllerPublisher(topics_to_pub, robot.joint_names, self.state_subscriber.states)
         else:
             self.controller_publisher = ControllerPublisher(topics_to_pub, robot.joint_names, self.state_subscriber.states)
-        self.controller_publisher.set_parameters([Parameter('use_sim_time', value=self.use_sim_time)])
+
         self.pub_thread = Thread(target=spin_executor, args=(self.controller_publisher,"Publisher Thread",'multi'))
         self.pub_thread.start()
 
-    def setup_get_move_group_params(self):
-        self.get_param_cli = self.moveit_node.create_client(GetParameters, '/move_group/get_parameters')
+    def setup_get_move_group_params(self, get_parameters='/move_group/get_parameters'):
+        self.get_param_cli = self.moveit_node.create_client(GetParameters, get_parameters)
         while not self.get_param_cli.wait_for_service(timeout_sec=1.0):
             self.moveit_node.get_logger().info('[Env] [Moveit] service not available, waiting again...')
         self.req = GetParameters.Request()
@@ -271,7 +266,8 @@ class ROS2Env(BaseEnv):
         with self.command_lock:
             self.controller_publisher.command_pos = copy.deepcopy(self.state_subscriber.states['pos'])
             self.controller_publisher.command_vel = np.zeros_like(self.state_subscriber.states['vel'])
-    
+
+
         return np.array(self.state_subscriber.states['pos'].copy())
     
     def step(self, command):

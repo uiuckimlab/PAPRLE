@@ -5,7 +5,6 @@ import time
 sys.path.append("/usr/lib/python3/dist-packages")
 sys.path.append("/opt/ros/noetic/lib/python3.8/site-packages/")
 import rospy
-import rospy
 import numpy as np
 from omegaconf import OmegaConf
 import moveit_commander

@@ -18,6 +18,7 @@ paprle/envs/base_env.py
 paprle/envs/isaacgym_env.py
 paprle/envs/mujoco_env.py
 paprle/envs/ros2_env.py
+paprle/envs/ros_env.py
 paprle/envs/isaacgym_env_utils/__init__.py
 paprle/envs/isaacgym_env_utils/isaac_utils.py
 paprle/envs/isaacgym_env_utils/se3_utils.py
@@ -29,6 +30,8 @@ paprle/envs/mujoco_env_utils/utility.py
 paprle/envs/ros2_env_utils/__init__.py
 paprle/envs/ros2_env_utils/g1_subscribe_and_publish.py
 paprle/envs/ros2_env_utils/subscribe_and_publish.py
+paprle/envs/ros_env_utils/__init__.py
+paprle/envs/ros_env_utils/subscribe_and_publish.py
 paprle/hands/__init__.py
 paprle/hands/base.py
 paprle/hands/parallel_gripper.py

@@ -1,4 +1,6 @@
 from rclpy.node import Node
+from rcl_interfaces.srv import GetParameters
+from rclpy.parameter import Parameter, ParameterType
 from std_msgs.msg import Header
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
@@ -45,9 +47,26 @@ class JointStateSubscriber(Node):
             self.states['eff'][id2] = np.array(msg.effort)[id1]
         self.flag_first_state_updated[topic] = True
 
+
 class ControllerPublisher(Node):
     def __init__(self, pub_info, command_joint_names, joint_states, timer_period=0.02):
         super().__init__('controller_publisher')
+
+        self.cli = self.create_client(GetParameters, '/controller_manager/get_parameters')
+        while not self.cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().debug('Waiting for parameter service... controller_manager_get_parameters')
+        self.req = GetParameters.Request()
+        self.req.names = ['use_sim_time']
+        future = self.cli.call_async(self.req)
+        rclpy.spin_until_future_complete(self, future)
+        if future.result() is not None:
+            values = future.result().values
+            for v in values:
+                self.get_logger().info(f'Value: {v.string_value}')
+        else:
+            self.get_logger().error('Failed to call service')
+        self.set_parameters([Parameter('use_sim_time', value=values[0].bool_value)])
+
         self.timer_period = timer_period
         self.pub_info = pub_info
         self.pubs = {}

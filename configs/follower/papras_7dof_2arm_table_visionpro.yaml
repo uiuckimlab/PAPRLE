@@ -16,11 +16,11 @@ robot_cfg:
     robot4: ['robot4/gripper']
   max_joint_vel: 2.0 # Maximum joint velocity
   end_effector_link:
-    robot3: 'robot3/end_effector_link'
-    robot4: 'robot4/end_effector_link'
+    robot3: 'robot3/wrist_link'
+    robot4: 'robot4/wrist_link'
 
-  init_qpos: [0.384, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0,
-           -0.384, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0]
+  init_qpos: [0.0, 0.0, 0.0, 0.8, 0.0, -0.767, 0.0, 0.0,
+              0.0, 0.0, 0.0, 0.8, 0.0, -0.767, 0.0, 0.0]
   viewer_args:
     mujoco:
       azimuth: 172.7000000000001
@@ -44,7 +44,7 @@ ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
   robot3:
     # chain of joint names from base to end effector in ik_model
     joint_names: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6', 'robot1/joint7']
-    ee_link: robot1/end_effector_link
+    ee_link: robot1/wrist_link
     dt: 0.05
     asset_dir: ${mesh_dir} # Directory for assets
     urdf_path: 'models/PAPRAS/papras_7dof/papras_7dof.urdf'
@@ -54,7 +54,7 @@ ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
 
   robot4:
     joint_names: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6', 'robot1/joint7']
-    ee_link: robot1/end_effector_link
+    ee_link: robot1/wrist_link
     dt: 0.05
     asset_dir: ${mesh_dir} # Directory for assets
     urdf_path: 'models/PAPRAS/papras_7dof/papras_7dof.urdf'

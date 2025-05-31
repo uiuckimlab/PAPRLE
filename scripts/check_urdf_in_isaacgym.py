@@ -156,7 +156,7 @@ def visualize_urdf(urdf_file, simulate, disable_self_collision, fix_root):
             print("")
         if simulate:
             # step the physics
-            qpos = trajectory[step] #* 0.0
+            qpos = trajectory[step] * 0.0
             if len(mimic_joints_info) > 0:
                 qpos[mimic_joints_info[:, 0].astype(np.int32)] = qpos[mimic_joints_info[:, 1].astype(np.int32)] * mimic_joints_info[:, 2] + mimic_joints_info[:, 3]
             for i in range(num_dof):

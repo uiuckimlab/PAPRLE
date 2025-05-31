@@ -113,7 +113,7 @@ class Teleoperator:
                     #self.viz.log = self.vis_log
                     self.viz.render()
                     self.last_image = self.viz.env.grab_image()
-            time.sleep(0.001)
+            time.sleep(0.03)
 
     def step(self, command, initial=False):
         target_qpos = self.last_target_qpos.copy()
@@ -160,7 +160,11 @@ class Teleoperator:
 
         return qpos
 
-    def reset(self):
+    def reset(self, initial_qpos=None):
+        if initial_qpos is None:
+            self.init_qpos = initial_qpos
+            self.robot.init_qpos = self.init_qpos
+
         for eef_idx, limb_name in enumerate(self.robot.limb_names):
             self.hand_solvers[limb_name].reset()
             if len(self.ik_solvers) > 0:

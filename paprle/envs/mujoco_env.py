@@ -3,6 +3,14 @@ from paprle.envs.base_env import BaseEnv
 from paprle.envs.mujoco_env_utils.mujoco_parser import MuJoCoParserClass
 import mujoco
 
+def lp_filter(new_value, prev_value, alpha=0.5):
+    if prev_value is None: return new_value
+    if not isinstance(prev_value, np.ndarray): prev_value = np.array(prev_value)
+    if not isinstance(new_value, np.ndarray): new_value = np.array(new_value)
+    if prev_value.shape != new_value.shape:
+        prev_value = prev_value.mean(0)
+    y = alpha * new_value + (1 - alpha) * prev_value
+    return y
 
 
 # mujoco==3.1.6 mujoco_python_viewer==0.1.4
@@ -57,6 +65,7 @@ class MujocoEnv(BaseEnv):
                 VIS_TRANSPARENT=False,
             )
 
+        self.prev_action = None
         self.initialized = True
         return
 
@@ -81,6 +90,10 @@ class MujocoEnv(BaseEnv):
     def step(self, action):
         self.tick = self.tick + 1
         #self.set_qpos(action)
+
+        action = lp_filter(action, self.prev_action, alpha=0.05)
+        self.prev_action = action
+
         new_qpos = np.zeros(self.dof)
         new_qpos[self.ctrl_joint_idxs] = action
         if len(self.mimic_joints_info):

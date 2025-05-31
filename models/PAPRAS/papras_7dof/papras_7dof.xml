@@ -49,6 +49,8 @@
                     <inertial pos="0.00337 0 0" mass="0.01919" diaginertia="1 1 1"/>
                     <joint name="robot1/joint7" pos="0 0 0" axis="1 0 0" range="-3.14159 3.14159" actuatorfrcrange="-100 100" damping="0.7"/>
                     <geom type="mesh" mesh="end_link"/>
+                    <body name="robot1/wrist_link" pos="0 0 0.135" quat="0 0.707107 0 0.707107">
+                    </body>                
                     <body name="robot1/gripper_main_link" pos="0.006 0 0" quat="0 0.707107 0 0.707107">
                       <inertial pos="0 0 0.032" mass="0.236" diaginertia="1 1 1"/>
                       <geom type="mesh" mesh="rh_p12_rn_base"/>

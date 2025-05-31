@@ -24,4 +24,7 @@ try:
 except ImportError:
     print("DualSenseController not available. Please install the required dependencies to use it.")
 
+from paprle.leaders.visionpro import VisionPro
+LEADERS_DICT['visionpro'] = VisionPro
+
 

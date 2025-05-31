@@ -443,6 +443,14 @@
     <selfCollide>1</selfCollide>
     <dampingFactor>0.01</dampingFactor>
   </gazebo>
+    <!-- End Effector -->
+  <link name="robot1/wrist_link">
+  </link>
+  <joint name="robot1/wrist_joint" type="fixed">
+    <parent link="robot1/end_link"/>
+    <child link="robot1/wrist_link"/>
+    <origin rpy="0 0 0" xyz="0.006 0.0 0.0"/>
+  </joint>
   <!-- gripper main fixed joint-->
   <joint name="robot1/end_link_fixed" type="fixed">
     <parent link="robot1/end_link"/>

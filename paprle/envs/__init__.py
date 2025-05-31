@@ -16,9 +16,6 @@ except Exception as e:
     warnings.warn('IsaacGym not found, or some error happened while importing IsaacGymEnv')
     warnings.warn("error:" + str(e))
 
-from paprle.envs.ros_env import ROSEnv
-ENV_DICT['ros'] = ROSEnv
-
 try:
     from paprle.envs.ros_env import ROSEnv
     ENV_DICT['ros'] = ROSEnv
