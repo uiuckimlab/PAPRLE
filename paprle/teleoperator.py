@@ -130,7 +130,7 @@ class Teleoperator:
                 target_ee_poses[follower_limb_name] = pq
                 arm_qpos = self.ik_solvers[follower_limb_name].solve(pos=pq[:3], quat=pq[3:])
                 inds = self.robot.ctrl_joint_idx_mapping[follower_limb_name]
-                if len(hand_command):
+                if len(hand_command) and len(self.robot.ctrl_hand_joint_idx_mapping[follower_limb_name]) > 0:
                     hand_qpos = self.hand_solvers[follower_limb_name].solve(hand_command[follower_limb_name])
                     target_qpos[inds] = np.concatenate([arm_qpos, hand_qpos])
                 else:

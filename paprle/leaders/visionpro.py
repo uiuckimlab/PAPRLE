@@ -215,7 +215,7 @@ class VisionPro:
         self.left_rot_filter = LPRotationFilter(0.4)
         self.right_rot_filter = LPRotationFilter(0.4)
 
-        self.streamer = CustomVisionProStreamer(leader_config.ip, record=False, replay='ep_recording.pkl')
+        self.streamer = CustomVisionProStreamer(leader_config.ip, record=False, replay='data/ep3_recording.pkl')
         if self.streamer.replay is not None:
             self.streamer_thread = Thread(target=self.streamer.replay_stream)
         else:

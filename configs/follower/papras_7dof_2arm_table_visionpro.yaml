@@ -14,13 +14,13 @@ robot_cfg:
   hand_joint_names: # hand names
     robot3: ['robot3/gripper']
     robot4: ['robot4/gripper']
-  max_joint_vel: 2.0 # Maximum joint velocity
+  max_joint_vel: 1.0 # Maximum joint velocity
   end_effector_link:
     robot3: 'robot3/wrist_link'
     robot4: 'robot4/wrist_link'
 
-  init_qpos: [0.0, 0.0, 0.0, 0.8, 0.0, -0.767, 0.0, 0.0,
-              0.0, 0.0, 0.0, 0.8, 0.0, -0.767, 0.0, 0.0]
+  init_qpos: [0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0,
+              0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0]
   viewer_args:
     mujoco:
       azimuth: 172.7000000000001

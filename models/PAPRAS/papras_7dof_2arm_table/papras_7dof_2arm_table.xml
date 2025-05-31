@@ -20,7 +20,7 @@
   </asset>
 
   <worldbody>
-    <body name="env" quat="0.000796327 0 0 1">
+    <body name="env" quat="0.000796327 0 0 1" pos="0 0 -0.05">
       <inertial pos="-0.00217819 0.0115131 4.82153e-05" quat="0.707114 -9.18314e-06 9.18295e-06 0.707099" mass="24.32" diaginertia="3.22235 2.59731 0.632618"/>
       <geom type="mesh" rgba="0.501961 0.501961 0.501961 1" mesh="table"/>
       <body name="robot3/link1" pos="-0.2599 0.50565 -0.05189">

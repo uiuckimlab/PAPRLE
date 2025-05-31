@@ -122,6 +122,9 @@ def sanity_check_leader_config(leader_config, robot_config, verbose=True):
                 leader_config.limb_mapping['right'] = limb_name
         print("Mapping completed.")
         print("- leader_config.limb_mapping: ", leader_config.limb_mapping)
+        if robot_name == 'g1':
+            leader_config.limb_mapping['left'] = 'left_arm'
+            leader_config.limb_mapping['right'] = 'right_arm'
 
 
 
