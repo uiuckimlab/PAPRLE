@@ -1,7 +1,7 @@
 type: visionpro
 name: visionpro
 
-ip: 10.0.0.219
+ip: 10.1.10.100 #10.0.0.219
 teleop_dt: 0.02
 output_type: delta_eef_pose # 'joint_pos' or 'eef_pose'
 

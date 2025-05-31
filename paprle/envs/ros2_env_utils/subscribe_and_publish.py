@@ -104,4 +104,4 @@ class ControllerPublisher(Node):
                 self.interpolate_time_[topic] += self.timer_period
             msg.points = [JointTrajectoryPoint(positions=pos, velocities=vel, accelerations=acc,
                                                time_from_start=self.duration_msg)]
-            self.pubs[topic].publish(msg)
+            #self.pubs[topic].publish(msg)

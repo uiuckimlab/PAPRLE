@@ -127,8 +127,6 @@ class CustomVisionProStreamer(VisionProStreamer):
         else:
             self.replay = None
 
-
-
     def replay_stream(self):
         while not self.shutdown and self.replay is not None:
             for id, transformations in enumerate(self.replay):
@@ -149,6 +147,7 @@ class CustomVisionProStreamer(VisionProStreamer):
                     stub = handtracking_pb2_grpc.HandTrackingServiceStub(channel)
                     responses = stub.StreamHandUpdates(request)
                     for response in responses:
+                        a = time.time()
                         left_joints = process_matrices(
                             response.left_hand.skeleton.jointMatrices
                         )
@@ -215,7 +214,7 @@ class VisionPro:
         self.left_rot_filter = LPRotationFilter(0.4)
         self.right_rot_filter = LPRotationFilter(0.4)
 
-        self.streamer = CustomVisionProStreamer(leader_config.ip, record=False, replay='data/ep3_recording.pkl')
+        self.streamer = CustomVisionProStreamer(leader_config.ip, record=False)#, replay='data/easy_recording.pkl')
         if self.streamer.replay is not None:
             self.streamer_thread = Thread(target=self.streamer.replay_stream)
         else:
