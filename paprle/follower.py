@@ -6,6 +6,7 @@ class Robot:
         self.robot_config = follower_config.robot_cfg
         self.ik_config = getattr(follower_config, 'ik_cfg', None)
         self.ros2_config = getattr(follower_config, 'ros2_cfg', None)
+        self.camera_config = getattr(follower_config, 'camera_cfg', None)
 
         self.name = self.robot_config.name
 

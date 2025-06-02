@@ -57,3 +57,20 @@ ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
     eps: 1e-3
     base_link: robot1/link1 # base_link in the original urdf file,not the base_link in the ik model
 
+camera_cfg:
+  right:
+    serial_number: '218722271580'#'102422071302'
+    rgb_resolution: [848, 480]
+    depth_resolution: [848, 480]
+    get_aligned: true
+    depth_units: 9.999999747378752e-05
+    fps: 30
+  left:
+    serial_number: '130322272130'#'102422071302'
+    rgb_resolution: [480,270]
+    depth_resolution: [480,270]
+    get_aligned: true
+    depth_units: 9.999999747378752e-05
+    fps: 30
+
+

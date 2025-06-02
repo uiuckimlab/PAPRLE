@@ -282,5 +282,13 @@ class ROSEnv(BaseEnv):
     def get_current_qpos(self):
         return np.array(self.state_subscriber.states['pos'].copy())
 
+    def get_observation(self):
+        obs_dict = {}
+        if self.camera_reader is not None:
+            obs_dict['camera'] = self.camera_reader.get_status()
 
+        obs_dict['qpos'] = np.array(self.state_subscriber.states['pos'].copy())
+        obs_dict['qvel'] = np.array(self.state_subscriber.states['vel'].copy())
+        obs_dict['qeff'] = np.array(self.state_subscriber.states['eff'].copy())
 
+        return obs_dict

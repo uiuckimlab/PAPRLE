@@ -3,6 +3,7 @@ from avp_stream.grpc_msg import *
 from threading import Thread
 from avp_stream.utils.grpc_utils import *
 import time
+import os
 import pickle
 import numpy as np
 from avp_stream import VisionProStreamer
@@ -110,17 +111,23 @@ class LPRotationFilter:
     def reset(self):
         self.y = None
         self.is_init = False
+
 class CustomVisionProStreamer(VisionProStreamer):
-    def __init__(self, ip, record=False, replay=None):
+    def __init__(self, ip, record=False, record_dir='sample_data/visionpro', replay=''):
         self.ip = ip
         self.record = record
+        self.record_dir = record_dir
+        if self.record:
+            os.makedirs(self.record_dir, exist_ok=True)
+            print("Visionpro Recording enabled, saving to", self.record_dir)
         self.recording = []
         self.latest = None
         self.axis_transform = YUP2ZUP[0][:3,:3]
         self.shutdown = False
         self.stream_running = False
         self.transform_lock = Lock()
-        if replay is not None:
+        self.flag_save = False
+        if replay is not None and len(replay) > 0 and os.path.exists(replay):
             with open(replay, "rb") as f:
                 self.replay = pickle.load(f)
             print("Replay loaded from", replay)
@@ -186,10 +193,16 @@ class CustomVisionProStreamer(VisionProStreamer):
                         with self.transform_lock:
                             self.latest = transformations
                         self.stream_running = True
+
+                        if self.flag_save:
+                            file_name = f'{self.record_dir}/{time.strftime("%Y%m%d-%H%M%S")}.pkl'
+                            with open(file_name, "wb") as f:
+                                pickle.dump(self.recording, f)
+                            self.recording = []
+                            self.flag_save = False
             except Exception as e:
                 pass
                 #print(f"An error occurred: {e}")
-
 
             # with open("recording.pkl", "wb") as f:
             #     pickle.dump(self.recording, f)
@@ -209,20 +222,23 @@ class VisionPro:
         self.motion_scale = self.leader_config.motion_scale
         self.left_finger_angles, self.right_finger_angles = None, None
         self.left_finger_good_for_init, self.right_finger_good_for_init = None, None
-        self.left_pos_filter = LPFilter(0.1)
-        self.right_pos_filter = LPFilter(0.1)
+        self.left_pos_filter = LPFilter(0.4)
+        self.right_pos_filter = LPFilter(0.4)
         self.left_rot_filter = LPRotationFilter(0.4)
         self.right_rot_filter = LPRotationFilter(0.4)
 
-        self.streamer = CustomVisionProStreamer(leader_config.ip, record=False)#, replay='data/easy_recording.pkl')
+        self.streamer = CustomVisionProStreamer(leader_config.ip, record=leader_config.record, record_dir=leader_config.save_dir,
+                                                replay=leader_config.replay)
         if self.streamer.replay is not None:
             self.streamer_thread = Thread(target=self.streamer.replay_stream)
         else:
             self.streamer_thread = Thread(target=self.streamer.stream)
         self.streamer_thread.start()
 
-        self.viz_thread = Thread(target=self.__render_mujoco)
-        self.viz_thread.start()
+        self.render_mode = render_mode
+        if render_mode == 'human':
+            self.viz_thread = Thread(target=self.__render_mujoco)
+            self.viz_thread.start()
 
         self.leader_viz_info = {'color': 'blue',  'log': "VisionPro is ready!"}
         self.end_detection_thread = Thread(target=self.detect_end_signal)
@@ -238,6 +254,7 @@ class VisionPro:
             lookat=[0.066,0.033,1.214]
         )
         I3 = np.eye(3)
+
         while not self.shutdown:
             if self.streamer.latest is None or not self.streamer.stream_running:
                 time.sleep(0.01)
@@ -319,7 +336,14 @@ class VisionPro:
             time.sleep(0.01)
 
 
+
+
     def launch_init(self, initial_qpos):
+
+        if self.streamer.record and len(self.streamer.recording) > 0:
+            print("Saving Visionpro recording from previous EP...")
+            self.streamer.flag_save = True
+
         # launch detecting initialization process
         while (self.streamer.latest is None) or ((time.time() - self.streamer.latest['timestamp']) > 0.01):
             #print("Curr gripper values:", self.leader_states[self.hand_ids])
@@ -328,7 +352,6 @@ class VisionPro:
 
         self.init_thread = Thread(target=self.initialize)
         self.init_thread.start()
-
         return
 
     def initialize(self):

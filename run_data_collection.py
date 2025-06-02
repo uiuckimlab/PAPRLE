@@ -2,17 +2,26 @@ import sys
 import signal
 import time
 import cv2
+from argparse import RawTextHelpFormatter
 from threading import Thread
 import warnings
 
 from configs import BaseConfig
-follower_config, leader_config, env_config = BaseConfig().parse()
+import argparse
+# Parse command line arguments
+parser = argparse.ArgumentParser(add_help=False, formatter_class=RawTextHelpFormatter)
+parser.add_argument('--save_dir', type=str, default='demo_data', help='Directory to save the collected data')
+
+follower_config, leader_config, env_config = BaseConfig().parse(parser)
+args, _ = parser.parse_known_args()
+SAVE_DIR_BASE = args.save_dir
 
 from paprle.teleoperator import Teleoperator
 from paprle.follower import Robot
 from paprle.leaders import LEADERS_DICT
 from paprle.envs import ENV_DICT
 from paprle.feedback import Feedback
+from paprle.utils.misc import make_episode
 from threading import Thread
 
 TIME_DEBUG = False
@@ -37,6 +46,25 @@ class Runner:
         self.reset = False
 
         self.last_log_time = None
+
+        self.data_sequence = []
+        self.save_thread = Thread(target=self.watch_and_save)
+        self.save_thread.start()
+
+    def watch_and_save(self,):
+        import pickle
+        iteration = 0
+        while not self.shutdown or len(self.data_sequence) > 0:
+            if len(self.data_sequence) == 0:
+                time.sleep(0.01)
+                continue
+            file_name, data = self.data_sequence.pop(0)
+            with open(file_name, 'wb') as f:
+                pickle.dump(data, f)
+            iteration += 1
+            time.sleep(1e-4)
+
+
 
     def shutdown_handler(self, sig, frame):
         print("Shutting down the system..")
@@ -71,6 +99,8 @@ class Runner:
                 self.shutdown_handler(None, None)
         return
     def run(self):
+
+        save_dir = make_episode(self.robot_config, self.leader_config, self.env_config, folder_name=SAVE_DIR_BASE)
         init_env_qpos = self.env.reset() # Move the robot to the default position
         self.teleop.reset(init_env_qpos)
         shutdown = self.leader.launch_init(init_env_qpos) # Wait in the initialize function until the leader is ready (for visionpro and gello)
@@ -96,8 +126,12 @@ class Runner:
                 print("===========================")
                 self.log_time('Start Loop')
 
+            step_dict = {}
+            step_dict['obs'] = self.env.get_observation()
+
             # 1. Get command from leader
             command = self.leader.get_status()
+            step_dict['command'] = command
 
             if TIME_DEBUG: self.log_time('leader Get Status')
 
@@ -105,6 +139,7 @@ class Runner:
             if self.leader.require_end or self.reset:
                 self.reset = False
                 init_env_qpos = self.env.reset()
+                save_dir = make_episode(self.robot_config, self.leader_config, self.env_config, folder_name=SAVE_DIR_BASE)
                 self.teleop.reset(init_env_qpos)
                 shutdown = self.leader.launch_init(init_env_qpos)  # Wait in the initialize function until the leader is ready (for visionpro and gello)
                 if shutdown: return
@@ -121,11 +156,16 @@ class Runner:
 
             # 2. Get joint positions from teleop
             qposes = self.teleop.step(command)
+            step_dict['target_qpos'] = qposes
 
             if TIME_DEBUG: self.log_time('Teleop Step Time ')
 
             # 3. Send joint positions to the robot
             self.env.step(qposes)
+
+            step_dict['timestamp'] = time.time()
+            file_name = f'{save_dir}/data_{step_dict["timestamp"]:10.04f}.pkl'
+            self.data_sequence.append((file_name, step_dict))
 
             if TIME_DEBUG: self.log_time('Env Step Time')
 

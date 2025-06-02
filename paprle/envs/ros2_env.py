@@ -6,6 +6,8 @@ from threading import Thread, Lock
 from rclpy.node import Node
 
 from rcl_interfaces.srv import GetParameters
+
+from paprle.camera.realsense_reader import RealSenseReader
 from paprle.envs.base_env import BaseEnv
 from pymoveit2 import MoveIt2
 import xml.etree.ElementTree as ET
@@ -27,7 +29,6 @@ def calculate_vel(last_qpos, qpos, dt):
     vel = (qpos - last_qpos) / dt
     return vel
 
-# TODO: change use_sim_time param to True if you want to use gazebo
 class ROS2Env(BaseEnv):
     def __init__(self, robot, device_config, env_config, verbose=False, render_mode=False, **kwargs):
         super().__init__(robot, device_config, env_config, verbose=verbose, render_mode=render_mode, **kwargs)
@@ -86,7 +87,6 @@ class ROS2Env(BaseEnv):
         self.sub_thread = Thread(target=spin_executor, args=(self.state_subscriber,"Subscriber Thread"))
         self.sub_thread.start()
 
-        # TODO: Maybe wait here until the first state is updated
         iter = 0
         while not all(self.state_subscriber.flag_first_state_updated.values()):
             ss = '.' * (iter % 5 + 1)
@@ -105,6 +105,14 @@ class ROS2Env(BaseEnv):
 
         self.pub_thread = Thread(target=spin_executor, args=(self.controller_publisher,"Publisher Thread",'multi'))
         self.pub_thread.start()
+
+        # Initialize camera reader if available
+        self.camera_reader = None
+        if robot.camera_config is not None:
+            from paprle.camera.realsense_reader import RealSenseReader
+            self.camera_reader = RealSenseReader(robot.camera_config)
+            self.camera_reader.start()
+            print("[Env] Camera reader started")
 
     def setup_get_move_group_params(self, get_parameters='/move_group/get_parameters'):
         self.get_param_cli = self.moveit_node.create_client(GetParameters, get_parameters)
@@ -288,12 +296,16 @@ class ROS2Env(BaseEnv):
     def get_current_qpos(self):
         return np.array(self.state_subscriber.states['pos'].copy())
 
+    def get_observation(self):
+        obs_dict = {}
+        if self.camera_reader is not None:
+            obs_dict['camera'] = self.camera_reader.get_status()
 
+        obs_dict['qpos'] = np.array(self.state_subscriber.states['pos'].copy())
+        obs_dict['qvel'] = np.array(self.state_subscriber.states['vel'].copy())
+        obs_dict['qeff'] = np.array(self.state_subscriber.states['eff'].copy())
 
-
-
-
-
+        return obs_dict
 
 
 

@@ -14,7 +14,7 @@ robot_cfg:
   hand_joint_names: # hand names
     robot3: ['robot3/gripper']
     robot4: ['robot4/gripper']
-  max_joint_vel: 1.0 # Maximum joint velocity
+  max_joint_vel: 5.0 # Maximum joint velocity
   end_effector_link:
     robot3: 'robot3/wrist_link'
     robot4: 'robot4/wrist_link'
@@ -95,7 +95,6 @@ ros1_cfg:
       hand_state_sub_topic: ${...state_sub_topic}
       arm_state_sub_msg_type: ${...state_sub_msg_type}
       hand_state_sub_msg_type: ${...state_sub_msg_type}
-  cameras: []
 
 ros2_cfg:
   lp_filter_alpha: 0.8
@@ -130,4 +129,17 @@ ros2_cfg:
       hand_state_sub_topic: ${...state_sub_topic}
       arm_state_sub_msg_type: ${...state_sub_msg_type}
       hand_state_sub_msg_type: ${...state_sub_msg_type}
-  cameras: []
+
+camera_cfg:
+  top:
+    serial_number: 'f0171772'
+    rgb_resolution: [640, 360]
+    depth_resolution: [640, 480]
+    get_aligned: true
+    depth_units: 0.0002500000118743628
+  right:
+    serial_number: '130322274055'#'102422071302'
+    rgb_resolution: [480, 270]
+    depth_resolution: [480, 270]
+    get_aligned: false
+    depth_units: 9.999999747378752e-05

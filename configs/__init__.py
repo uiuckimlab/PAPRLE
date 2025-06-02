@@ -14,8 +14,9 @@ class BaseConfig:
     def __init__(self):
         change_working_directory()
 
-    def parse(self, verbose=True):
-        parser = argparse.ArgumentParser(add_help=False, formatter_class=RawTextHelpFormatter)
+    def parse(self, parser=None):
+        if parser is None:
+            parser = argparse.ArgumentParser(add_help=False, formatter_class=RawTextHelpFormatter)
         parser.add_argument('--follower','-f', type=str, default='papras_6dof')
         parser.add_argument('--leader', '-l', type=str, default='sliders')
         parser.add_argument('--env', '-e', type=str, default='mujoco')
