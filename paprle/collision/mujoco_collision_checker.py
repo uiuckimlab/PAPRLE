@@ -177,5 +177,4 @@ class MujocoCollisionChecker:
         to_Rt[:3, 3] = to_p
 
         Rt = np.linalg.inv(from_Rt) @ to_Rt
-
         return Rt

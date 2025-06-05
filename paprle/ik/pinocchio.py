@@ -16,6 +16,7 @@ class PinocchioIKSolver(BaseIKSolver):
         self.ee_name = ik_config.ee_link
         self.base_name = ik_config.base_link
         self.repeat = getattr(ik_config, 'repeat', 1)
+        self.max_iter = getattr(ik_config, 'max_iter', 30)
 
         urdf_path = os.path.abspath(ik_config.urdf_path)
         self.model, self.collision_model, self.visual_model = pin.buildModelsFromUrdf(str(urdf_path),
@@ -75,7 +76,7 @@ class PinocchioIKSolver(BaseIKSolver):
         oMdes = pin.XYZQUATToSE3(pose_vec)
         oMdes = self.base_pose.act(oMdes)
         qpos = self.qpos.copy()
-        for k in range(30):
+        for k in range(self.max_iter):
             pin.forwardKinematics(self.model, self.data, qpos)
             ee_pose = pin.updateFramePlacement(self.model, self.data, self.ee_frame_id)
             J = pin.computeFrameJacobian(self.model, self.data, qpos, self.ee_frame_id)

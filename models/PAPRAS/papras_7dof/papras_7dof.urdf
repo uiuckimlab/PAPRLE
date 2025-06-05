@@ -712,6 +712,14 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
     </inertial>
   </link>
+  <joint name="robot1/hand_joint" type="fixed">
+    <parent link="robot1/gripper_main_link"/>
+    <child link="robot1/hand_link"/>
+    <origin rpy="3.141592653589793 -1.5707963267948966 0" xyz="0.0 0.0 0.10"/>
+  </joint>
+  <!-- End Effector -->
+  <link name="robot1/hand_link">
+  </link>
   <gazebo reference="robot1/end_effector_link">
     <material>Gazebo/Red</material>
   </gazebo>
