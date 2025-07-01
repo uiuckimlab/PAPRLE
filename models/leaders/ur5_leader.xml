@@ -1,0 +1,58 @@
+<mujoco model="ur5_leader">
+  <compiler angle="radian" meshdir="../" autolimits="true" strippath="false" fusestatic="false"/>
+  <include file="scene/floor_sky.xml" />
+  <asset>
+    <mesh name="leaders/base_link" file="assets/leaders/base_link.stl"/>
+    <mesh name="leaders/link1" file="assets/leaders/ur5/link1.stl"/>
+    <mesh name="leaders/link2" file="assets/leaders/ur5/link2.stl"/>
+    <mesh name="leaders/link3" file="assets/leaders/ur5/link3.stl"/>
+    <mesh name="leaders/link4" file="assets/leaders/ur5/link4.stl"/>
+    <mesh name="leaders/link5" file="assets/leaders/ur5/link5.stl"/>
+    <mesh name="leaders/handle" file="assets/leaders/handle.stl"/>
+    <mesh name="leaders/trigger" file="assets/leaders/trigger.stl"/>
+  </asset>
+  <worldbody>
+    <body name="robot1/base_link" pos="0.2599 0.33455 -0.05189">
+      <inertial pos="-1.88052e-05 -0.00215271 0.0441443" quat="0.706967 -0.0205139 0.0210041 0.706636" mass="0.218377" diaginertia="0.000190447 0.000160297 9.3009e-05"/>
+      <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="leaders/base_link"/>
+      <body name="robot1/link1" pos="-0.000125 0 0.099" quat="0.5 -0.5 0.5 -0.5">
+        <inertial pos="0.0148795 -0.0192919 -5.81797e-07" quat="-0.136634 0.693765 0.136688 0.693785" mass="0.041336" diaginertia="1.4757e-05 1.31665e-05 6.10611e-06"/>
+        <joint name="robot1/joint1" pos="0 0 0" axis="0 1 0" range="-3.14159 3.14159" actuatorfrcrange="-1 1"/>
+        <geom type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="leaders/link1"/>
+        <body name="robot1/link2" pos="0.0415 -0.0215795 0" quat="0.5 0.5 -0.5 -0.5">
+          <inertial pos="0.108251 -1.58317e-07 -0.0202159" quat="0 0.707103 0 0.707111" mass="0.160619" diaginertia="0.000475236 0.000472064 1.76671e-05"/>
+          <joint name="robot1/joint2" pos="0 0 0" axis="0 0 1" range="-3.14159 3.14159" actuatorfrcrange="-1 1"/>
+          <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="leaders/link2"/>
+          <body name="robot1/link3" pos="0.2165 0 0" quat="9.61385e-08 0.707107 9.61385e-08 -0.707107">
+            <inertial pos="-0.0316552 -9.1259e-07 -0.0848519" quat="0.706727 0.0233038 0.0233054 0.706718" mass="0.198785" diaginertia="0.000644635 0.000637932 3.63709e-05"/>
+            <joint name="robot1/joint3" pos="0 0 0" axis="1 0 0" range="-3.14159 3.14159" actuatorfrcrange="-1 1"/>
+            <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="leaders/link3"/>
+            <body name="robot1/link4" pos="0.003 0 -0.1965" quat="0.707105 -0.707108 0 0">
+              <inertial pos="0 0 0" quat="-0.136263 0.693868 0.136223 0.693847" mass="0.0355249" diaginertia="7.58542e-06 7.41606e-06 3.98046e-06"/>
+              <joint name="robot1/joint4" pos="0 0 0" axis="1 0 0" range="-3.14159 3.14159" actuatorfrcrange="-1 1"/>
+              <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="leaders/link4"/>
+              <body name="robot1/link5" pos="0.017 -0.045 0" quat="0.707107 0 0 0.707107">
+                <inertial pos="0.0102587 8.51173e-07 -0.00137103" quat="-0.00105342 0.554683 -0.000722352 0.832061" mass="0.0293815" diaginertia="5.52971e-06 5.5137e-06 3.2385e-06"/>
+                <joint name="robot1/joint5" pos="0 0 0" axis="1 0 0" range="-3.14159 3.14159" actuatorfrcrange="-1 1"/>
+                <geom type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="leaders/link5"/>
+                <body name="robot1/handle" pos="-0.001 0 0.015">
+                  <inertial pos="-0.0269505 -0.000444553 0.00944823" quat="0.261049 0.67125 -0.253453 0.645785" mass="0.0792319" diaginertia="5.60819e-05 4.59189e-05 2.21058e-05"/>
+                  <joint name="robot1/joint6" pos="0 0 0" axis="0.052336 0 0.99863" range="-3.14159 3.14159" actuatorfrcrange="-1 1"/>
+                  <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="leaders/handle"/>
+                  <body name="robot1/trigger" pos="0.0154268 0 0.0226837" quat="0.0 -0.376 0.0 0.927">
+                    <inertial pos="0.00504847 0.00657609 0.0232193" quat="0.989454 0.108874 0.0494822 0.0817224" mass="0.0113374" diaginertia="2.75937e-06 2.61293e-06 6.92748e-07"/>
+                    <joint name="robot1/gripper" pos="0 0 0" axis="0 -1 0" range="0 1.2" actuatorfrcrange="-1 1"/>
+                    <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="leaders/trigger"/>
+                  </body>
+                  <body name="robot1/end_effector_link" quat="0.500398 0.5 -0.5 0.499602">
+                    <inertial pos="0 0 0" mass="0.001" diaginertia="1 1 1"/>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

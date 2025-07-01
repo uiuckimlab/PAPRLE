@@ -1,0 +1,92 @@
+mesh_dir: 'models/' # Default directory for meshes
+robot_cfg:
+  name: papras_stand
+  asset_cfg:
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/PAPRAS/papras_stand/papras_stand.urdf' # Path to the URDF file
+    xml_path: 'models/PAPRAS/papras_stand/papras_stand.xml' # If you have xml file, specify the path here or just use urdf file here as well
+  ignore_collision_pairs: []
+  control_dt: 0.02 # Control loop frequency - if we are using joint trajectory controller, it is enough
+  eef_type: 'parallel_gripper' # Type of end effector: 'hand', 'power_gripper', 'parallel_gripper'
+  limb_joint_names:
+    robot1: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6','robot1/joint7']
+    robot2: ['robot2/joint1', 'robot2/joint2', 'robot2/joint3', 'robot2/joint4', 'robot2/joint5', 'robot2/joint6','robot2/joint7']
+  hand_joint_names: # hand names
+    robot1: ['robot1/gripper']
+    robot2: ['robot2/gripper']
+  max_joint_vel: 2.0 # Maximum joint velocity
+  end_effector_link:
+    robot1: 'robot1/end_effector_link'
+    robot2: 'robot2/end_effector_link'
+
+  init_qpos: [-2.134, 0.403, 0.0, -0.282, -1.518, -0.516,-0.0, 0.0,
+             2.134, 0.403, 0.0, -0.282, 1.518, -0.516,-0.0, 0.0]
+  viewer_args:
+    mujoco:
+      azimuth: 176.07500000000002
+      distance: 3.0291966528216743
+      elevation: -21.125000000000007
+      lookat: [-0.2154221244856082, 0.04116639723596615, 1.020007498794329]
+    isaacgym:
+      cam_pos: [1.41, -0.36, 0.58]
+      cam_target: [0.45, -0.23, 0.31]
+    trimesh:
+      pq: [ 1.81470852, -0.07449861,  2.2863356,   0.59885157,  0.40119295,  0.37600106, 0.58227503]
+
+ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
+  # the number of arms in the urdf file, the name of the robot does not matter, but order matters.
+  robot1:
+    # chain of joint names from base to end effector in ik_model
+    joint_names: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6', 'robot1/joint7']
+    ee_link: robot1/end_effector_link
+    dt: 0.05
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/PAPRAS/papras_7dof/papras_7dof.urdf'
+    ik_damping: 0.075
+    eps: 1e-3
+    base_link: robot1/link1 # base_link in the original urdf file,not the base_link in the ik model
+
+  robot2:
+    joint_names: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6', 'robot1/joint7']
+    ee_link: robot1/end_effector_link
+    dt: 0.05
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/PAPRAS/papras_7dof/papras_7dof.urdf'
+    ik_damping: 0.075
+    eps: 1e-3
+    base_link: robot2/link1 # base_link in the original urdf file,not the base_link in the ik model
+
+ros2_cfg:
+  lp_filter_alpha: 0.9
+  motion_planning: 'interpolate' # moveit or interpolation
+  moveit:
+    namespace: 'followers'
+    arm_group_name: 'arm12'
+    hand_group_name: 'gripper12'
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: True
+  state_sub_topic: '/joint_states' # Topic to subscribe for joint states
+  state_sub_msg_type: 'sensor_msgs/msg/JointState' # Message type for joint states
+  robots:
+    robot1:
+      arm_control_topic: '/arm1_controller/joint_trajectory'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/gripper1_controller/joint_trajectory'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+    robot2:
+      arm_control_topic: '/arm2_controller/joint_trajectory'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/grippe2_controller/joint_trajectory'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+  cameras: []

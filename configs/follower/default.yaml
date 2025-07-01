@@ -1,0 +1,61 @@
+mesh_dir: 'models/' # Default directory for meshes
+robot_cfg:
+  name:
+  asset_cfg:
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: '' # Path to the URDF file
+    xml_path: '' # If you have xml file, specify the path here or just use urdf file here as well
+  ignore_collision_pairs: []
+  control_dt: 0.02 # Control loop frequency - if we are using joint trajectory controller, it is enough
+  eef_type: 'parallel_gripper' # Type of end effector: 'hand', 'power_gripper', 'parallel_gripper'
+  limb_joint_names: null
+  hand_joint_names: null
+  max_joint_vel: 2.0 # Maximum joint velocity
+  end_effector_link: null
+  init_qpos: []
+  viewer_args:
+    mujoco:
+      azimuth: 172.7000000000001
+      distance: 2.6093796441399872
+      elevation: -28.550000000000004
+      lookat: [-0.21228273,  0.03259374, -0.11615278]
+    isaacgym:
+      cam_pos: [1.41, -0.36, 0.58]
+      cam_target: [0.45, -0.23, 0.31]
+    trimesh:
+      pq:  [1.6723996641513676, -0.7507286806222732, 0.8682281906897257, 0.687230565118163, 0.4897546511147104, 0.2564309495761239, 0.4712724267113097]
+ik_cfg: null
+ros1_cfg:
+  lp_filter_alpha: 0.9
+  motion_planning: 'moveit' # moveit or interpolation
+  moveit:
+    namespace: '/followers'
+    arm_group_name: ''
+    hand_group_name: ''
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: True
+  state_sub_topic: '/followers/joint_states' # Topic to subscribe for joint states
+  state_sub_msg_type: 'sensor_msgs/msg/JointState' # Message type for joint states
+  robots: null
+  cameras: []
+
+ros2_cfg:
+  lp_filter_alpha: 0.8
+  motion_planning: 'moveit' # moveit or interpolation
+  moveit:
+    namespace: 'followers'
+    arm_group_name: ''
+    hand_group_name: ''
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: True
+  state_sub_topic: '/joint_states' # Topic to subscribe for joint states
+  state_sub_msg_type: 'sensor_msgs/msg/JointState' # Message type for joint states
+  robots: null
+
+camera_cfg: null

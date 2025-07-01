@@ -1,0 +1,7 @@
+type: keyboard
+name: keyboard
+
+teleop_dt: 0.02
+output_type: 'delta_eef_pose'
+# for eef-based mapping
+motion_scale: 1.0

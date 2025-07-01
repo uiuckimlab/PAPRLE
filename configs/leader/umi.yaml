@@ -1,0 +1,10 @@
+type: umi
+name: umi
+
+teleop_dt: 0.02
+output_type: delta_eef_pose # 'joint_pos' or 'delta_eef_pose'
+
+limb_names: ['right', 'left'] # order of hands in the output
+motion_scale: 1.0
+
+file_path: 'data/flip_result_filtered'

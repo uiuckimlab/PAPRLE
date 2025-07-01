@@ -1,0 +1,433 @@
+<mujoco model="hand">
+    <compiler angle="radian" meshdir="../"/>
+  <include file="../assets/scene/floor_sky.xml" />
+  <worldbody>
+
+    <!-- Head  -->
+    <body name="Head"  pos="0.0 0.0 0.0">
+      <joint type="free" name="head"/>
+      <geom type="sphere" size="0.01"/>
+      <geom type="cylinder" size="0.005 0.05" pos="0.05 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.005 0.05" pos="0 0.05 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.005 0.05" pos="0 0 0.05" rgba="0 0 1 1"/>
+    </body>
+    <body name="right_wrist"  pos="0.0 0.0 0.0">
+      <joint type="free" name="right_wrist"/>
+      <geom type="sphere" size="0.01"/>
+      <geom type="cylinder" size="0.005 0.05" pos="0.05 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.005 0.05" pos="0 0.05 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.005 0.05" pos="0 0 0.05" rgba="0 0 1 1"/>
+    </body>
+    <body name="left_wrist"  pos="00 0.0 0.0">
+      <joint type="free" name="left_wrist"/>
+      <geom type="sphere" size="0.01"/>
+      <geom type="cylinder" size="0.005 0.05" pos="0.05 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.005 0.05" pos="0 0.05 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.005 0.05" pos="0 0 0.05" rgba="0 0 1 1"/>
+    </body>
+
+    <!-- Right Finger 0~24 -->
+    <body name="right_finger_0"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_1"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_2"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_3"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_4"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_5"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_6"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_7"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_8"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_9"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_10"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_11"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_12"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_13"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_14"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_15"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_16"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_17"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_18"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_19"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_20"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_21"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_22"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_23"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="right_finger_24"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <!-- Left Finger 0~24 -->
+    <body name="left_finger_0"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_1"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_2"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_3"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_4"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_5"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_6"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_7"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_8"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_9"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_10"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_11"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_12"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_13"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_14"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_15"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_16"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_17"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_18"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_19"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_20"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_21"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_22"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_23"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="left_finger_24"  pos="0.0 0.0 0.0">
+      <joint type="free"/>
+      <geom type="sphere" size="0.005"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0.01 0 0" quat="0.5 0.5 0.5 0.5" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0.01 0" quat="-0.5 0.5 0.5 0.5" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.001 0.01" pos="0 0 0.01" rgba="0 0 1 1"/>
+    </body>
+
+
+  </worldbody>
+</mujoco>

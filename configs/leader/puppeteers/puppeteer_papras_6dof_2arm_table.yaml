@@ -1,0 +1,48 @@
+type: puppeteer
+name: puppeteer_papras_6dof_2arm_table
+
+teleop_dt: 0.02
+output_type: joint_pos # 'joint_pos' or 'delta_eef_pose'
+
+# for eef-based mapping
+motion_mapping: direct_scaling
+motion_scale: 1.0
+
+# for ROS-based controller
+leader_subscribe_topic: '/leaders/joint_states'
+limb_joint_names:
+  robot1: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6']
+  robot2: ['robot2/joint1', 'robot2/joint2', 'robot2/joint3', 'robot2/joint4', 'robot2/joint5', 'robot2/joint6']
+
+end_effector_link:
+  robot1: 'robot1/end_effector_link'
+  robot2: 'robot2/end_effector_link'
+
+hand_joint_names:
+  robot1: ['robot1/gripper']
+  robot2: ['robot2/gripper']
+
+init_qpos: [0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0, 0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0]
+
+# leader limb -> follower limb
+direct_mapping: # default is empty, which means 1:1 mapping
+  robot1: 'robot3'
+  robot2: 'robot4'
+
+reset_pose: [[0.15, 0.3, 0.2], [0.15, -0.3, 0.2]] # eef pose regarding world frame
+reset_cube: [[0.2, 0.1, 0.05], [0.2, 0.1, 0.05]] # half cube size of reset region
+
+asset_cfg:
+  asset_dir: 'models/'
+  urdf_path: 'models/leaders/papras_6dof_leaders_table.urdf'
+  xml_path: 'models/leaders/papras_6dof_leaders_table.xml'
+
+direct_mapping_available_robots: ['papras_6dof_2arm_table']
+hand_limits: # for gripper range mapping
+  robot1: [[-1.99, -1.0]]
+  robot2: [[-1.99, -1.0]]
+
+render_base: 'trimesh'
+viewer_args:
+    trimesh:
+      pq: [1.51597506, 1.04149913, 0.88220541, 0.34222756, 0.24566453, 0.50989899, 0.75002151]

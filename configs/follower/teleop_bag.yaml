@@ -1,0 +1,145 @@
+mesh_dir: models/
+robot_cfg:
+  name: teleop_bag
+  asset_cfg:
+    asset_dir: ${mesh_dir}
+    urdf_path: models/PAPRAS/papras_teleop_bag/papras_teleop_bag.urdf
+    xml_path: models/PAPRAS/papras_teleop_bag/papras_teleop_bag.urdf
+  ignore_collision_pairs: []
+  control_dt: 0.02
+  eef_type: parallel_gripper
+  limb_joint_names:
+    right:
+    - robot3/joint1
+    - robot3/joint2
+    - robot3/joint3
+    - robot3/joint4
+    - robot3/joint5
+    - robot3/joint6
+    - robot3/joint7
+    left:
+    - robot4/joint1
+    - robot4/joint2
+    - robot4/joint3
+    - robot4/joint4
+    - robot4/joint5
+    - robot4/joint6
+    - robot4/joint7
+  hand_joint_names:
+    right:
+    - robot3/gripper
+    left:
+    - robot4/gripper
+  max_joint_vel: 2.0
+  end_effector_link:
+    right: robot3/end_effector_link
+    left: robot4/end_effector_link
+  init_qpos:
+  - 0.39
+  - -0.47
+  - 0.0
+  - 0.5
+  - 0.0
+  - 0.3
+  - 0.0
+  - 0.0
+  - -0.39
+  - -0.47
+  - 0.0
+  - 0.5
+  - 0.0
+  - 0.3
+  - 0.0
+  - 0.0
+  viewer_args:
+    mujoco:
+      azimuth: 172.7000000000001
+      distance: 2.6093796441399872
+      elevation: -28.550000000000004
+      lookat:
+      - -0.21228273
+      - 0.03259374
+      - -0.11615278
+    isaacgym:
+      cam_pos:
+      - 1.41
+      - -0.36
+      - 0.58
+      cam_target:
+      - 0.45
+      - -0.23
+      - 0.31
+    trimesh:
+      pq:
+      - 1.6723996641513676
+      - -0.7507286806222732
+      - 0.8682281906897257
+      - 0.687230565118163
+      - 0.4897546511147104
+      - 0.2564309495761239
+      - 0.4712724267113097
+ik_cfg:
+  right:
+    urdf_path: models/PAPRAS/papras_7dof/papras_7dof.urdf
+    joint_names:
+    - robot1/joint1
+    - robot1/joint2
+    - robot1/joint3
+    - robot1/joint4
+    - robot1/joint5
+    - robot1/joint6
+    - robot1/joint7
+    ee_link: robot1/end_effector_link
+    base_link: robot3/link1
+    dt: 0.05
+    asset_dir: ${mesh_dir}
+    ik_damping: 0.075
+    eps: 0.001
+  left:
+    urdf_path: models/PAPRAS/papras_7dof/papras_7dof.urdf
+    joint_names:
+    - robot1/joint1
+    - robot1/joint2
+    - robot1/joint3
+    - robot1/joint4
+    - robot1/joint5
+    - robot1/joint6
+    - robot1/joint7
+    ee_link: robot1/end_effector_link
+    base_link: robot4/link1
+    dt: 0.05
+    asset_dir: ${mesh_dir}
+    ik_damping: 0.075
+    eps: 0.001
+ros1_cfg:
+  lp_filter_alpha: 0.9
+  motion_planning: moveit
+  moveit:
+    namespace: /followers
+    arm_group_name: ''
+    hand_group_name: ''
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: true
+  state_sub_topic: /followers/joint_states
+  state_sub_msg_type: sensor_msgs/msg/JointState
+  robots: null
+  cameras: []
+ros2_cfg:
+  lp_filter_alpha: 0.8
+  motion_planning: moveit
+  moveit:
+    namespace: followers
+    arm_group_name: ''
+    hand_group_name: ''
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: true
+  state_sub_topic: /joint_states
+  state_sub_msg_type: sensor_msgs/msg/JointState
+  robots: null
+camera_cfg: null

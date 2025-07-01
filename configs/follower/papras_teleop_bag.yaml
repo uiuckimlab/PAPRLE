@@ -1,0 +1,127 @@
+mesh_dir: 'models/' # Default directory for meshes
+robot_cfg:
+  name: papras_teleop_bag
+  asset_cfg:
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/PAPRAS/papras_teleop_bag/papras_teleop_bag.urdf' # Path to the URDF file
+    xml_path: 'models/PAPRAS/papras_teleop_bag/papras_teleop_bag.xml' # If you have xml file, specify the path here or just use urdf file here as well
+  ignore_collision_pairs: []
+  control_dt: 0.02 # Control loop frequency - if we are using joint trajectory controller, it is enough
+  eef_type: 'parallel_gripper' # Type of end effector: 'hand', 'power_gripper', 'parallel_gripper'
+  limb_joint_names:
+    robot3: ['robot3/joint1', 'robot3/joint2', 'robot3/joint3', 'robot3/joint4', 'robot3/joint5', 'robot3/joint6','robot3/joint7']
+    robot4: ['robot4/joint1', 'robot4/joint2', 'robot4/joint3', 'robot4/joint4', 'robot4/joint5', 'robot4/joint6','robot4/joint7']
+  hand_joint_names: # hand names
+    robot3: ['robot3/gripper']
+    robot4: ['robot4/gripper']
+  max_joint_vel: 10.0 # Maximum joint velocity
+  end_effector_link:
+    robot3: 'robot3/end_effector_link'
+    robot4: 'robot4/end_effector_link'
+
+  init_qpos: [0.384, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0,
+           -0.384, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0]
+  viewer_args:
+    mujoco:
+      azimuth: 172.7000000000001
+      distance: 2.6093796441399872
+      elevation: -28.550000000000004
+      lookat: [-0.21228273,  0.03259374, -0.11615278]
+    isaacgym:
+      cam_pos: [1.41, -0.36, 0.58]
+      cam_target: [0.45, -0.23, 0.31]
+    trimesh:
+      pq: [ 1.6723996641513676, -0.7507286806222732, 0.8682281906897257, 0.687230565118163, 0.4897546511147104, 0.2564309495761239, 0.4712724267113097 ]
+      resolution: [600,400]
+ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
+  # the number of arms in the urdf file, the name of the robot does not matter, but order matters.
+  robot3:
+    # chain of joint names from base to end effector in ik_model
+    joint_names: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6', 'robot1/joint7']
+    ee_link: robot1/end_effector_link
+    dt: 0.05
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/PAPRAS/papras_7dof/papras_7dof.urdf'
+    ik_damping: 0.075
+    eps: 1e-3
+    base_link: robot3/link1 # base_link in the original urdf file,not the base_link in the ik model
+
+  robot4:
+    joint_names: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6', 'robot1/joint7']
+    ee_link: robot1/end_effector_link
+    dt: 0.05
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/PAPRAS/papras_7dof/papras_7dof.urdf'
+    ik_damping: 0.075
+    eps: 1e-3
+    base_link: robot4/link1 # base_link in the original urdf file,not the base_link in the ik model
+
+ros1_cfg:
+  lp_filter_alpha: 0.9
+  motion_planning: 'moveit' # moveit or interpolation
+  moveit:
+    namespace: '/followers'
+    arm_group_name: 'arm34'
+    hand_group_name: 'gripper34'
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: True
+  state_sub_topic: '/followers/joint_states' # Topic to subscribe for joint states
+  state_sub_msg_type: 'sensor_msgs/msg/JointState' # Message type for joint states
+  robots:
+    robot3:
+      arm_control_topic: '/followers/arm3_controller/command'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/followers/gripper3_controller/command'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+    robot4:
+      arm_control_topic: '/followers/arm4_controller/command'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/followers/gripper4_controller/command'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+  cameras: []
+
+ros2_cfg:
+  lp_filter_alpha: 0.8
+  motion_planning: 'moveit' # moveit or interpolation
+  moveit:
+    namespace: 'followers'
+    arm_group_name: 'arm34'
+    hand_group_name: 'gripper34'
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: True
+  state_sub_topic: '/joint_states' # Topic to subscribe for joint states
+  state_sub_msg_type: 'sensor_msgs/msg/JointState' # Message type for joint states
+  robots:
+    robot3:
+      arm_control_topic: '/arm3_controller/joint_trajectory'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/gripper3_controller/joint_trajectory'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+    robot4:
+      arm_control_topic: '/arm4_controller/joint_trajectory'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/gripper4_controller/joint_trajectory'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+  cameras: []

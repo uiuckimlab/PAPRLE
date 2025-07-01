@@ -1,0 +1,66 @@
+<mujoco model="piper_table">
+  <compiler angle="radian" meshdir="../../"/>
+  <include file="../../assets/scene/floor_sky.xml" />
+  <asset>
+    <mesh name="base_link" file="assets/piper/base_link.STL"/>
+    <mesh name="link1" file="assets/piper/link1.STL"/>
+    <mesh name="link2" file="assets/piper/link2.STL"/>
+    <mesh name="link3" file="assets/piper/link3.STL"/>
+    <mesh name="link4" file="assets/piper/link4.STL"/>
+    <mesh name="link5" file="assets/piper/link5.STL"/>
+    <mesh name="link6" file="assets/piper/link6.STL"/>
+    <mesh name="gripper_base" file="assets/piper/gripper_base.STL"/>
+    <mesh name="link7" file="assets/piper/link7.STL"/>
+    <mesh name="link8" file="assets/piper/link8.STL"/>
+  </asset>
+  <worldbody>
+    <body name="robot1/base_link">
+      <inertial pos="-0.00473641 2.56829e-05 0.0414515" quat="0.70428 0.034288 0.0339756 0.708279" mass="1.02" diaginertia="0.00282612 0.00269117 0.000879394"/>
+      <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="base_link"/>
+      <body name="robot1/link1" pos="0 0 0.123">
+        <inertial pos="0.000121505 0.000104632 -0.00438597" quat="0.682111 0.730899 0.0143111 -0.0175062" mass="0.71" diaginertia="0.000489262 0.000439887 0.000404551"/>
+        <joint name="robot1/joint1" pos="0 0 0" axis="0 0 1" range="-2.618 2.168" actuatorfrcrange="-100 100"/>
+        <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="link1"/>
+        <body name="robot1/link2" quat="0.0356735 -0.0356786 -0.706207 -0.706205">
+          <inertial pos="0.198666 -0.0109269 0.00142122" quat="0.510131 0.475585 0.525075 0.48773" mass="1.17" diaginertia="0.0679032 0.067745 0.00111966"/>
+          <joint name="robot1/joint2" pos="0 0 0" axis="0 0 1" range="0 3.14" actuatorfrcrange="-100 100"/>
+          <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="link2"/>
+          <body name="robot1/link3" pos="0.28503 0 0" quat="0.637536 0 0 -0.77042">
+            <inertial pos="-0.0202738 -0.133915 -0.000458683" quat="0.706282 0.705111 0.0532202 0.0339395" mass="0.5" diaginertia="0.0138227 0.0138032 0.000244685"/>
+            <joint name="robot1/joint3" pos="0 0 0" axis="0 0 1" range="-2.967 0" actuatorfrcrange="-100 100"/>
+            <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="link3"/>
+            <body name="robot1/link4" pos="-0.021984 -0.25075 0" quat="0.707105 0.707108 0 0">
+              <inertial pos="-9.66636e-05 0.000876064 -0.00496881" quat="0.714689 -0.0948484 0.0635223 0.690064" mass="0.38" diaginertia="0.000191586 0.000185052 0.000152863"/>
+              <joint name="robot1/joint4" pos="0 0 0" axis="0 0 1" range="-1.745 1.745" actuatorfrcrange="-100 100"/>
+              <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="link4"/>
+              <body name="robot1/link5" quat="0.707105 -0.707108 0 0">
+                <inertial pos="-4.10554e-05 -0.0566487 -0.00372058" quat="0.709589 0.704614 0.00134613 -0.00132656" mass="0.383" diaginertia="0.00166169 0.00164328 0.000185028"/>
+                <joint name="robot1/joint5" pos="0 0 0" axis="0 0 1" range="-1.22 1.22" actuatorfrcrange="-100 100"/>
+                <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="link5"/>
+                <body name="robot1/link6" pos="8.8259e-05 -0.091 0" quat="0.707105 0.707108 0 0">
+                  <inertial pos="-8.82591e-05 9.05984e-06 -0.002" quat="0.5 0.5 -0.5 0.5" mass="0.0069909" diaginertia="1.06739e-06 5.73016e-07 5.73016e-07"/>
+                  <joint name="robot1/joint6" pos="0 0 0" axis="0 0 1" range="-2.0944 2.0944" actuatorfrcrange="-100 100"/>
+                  <geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="link6"/>
+                  <body name="robot1/gripper_base">
+                    <inertial pos="-0.000183807 8.05033e-05 0.0321437" quat="0.999976 9.08444e-05 0.00689649 0.000788512" mass="0.45" diaginertia="0.000929442 0.000714469 0.000394318"/>
+                    <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="gripper_base"/>
+                    <body name="robot1/link7" pos="0 0 0.1358" quat="0.707105 0.707108 0 0">
+                      <inertial pos="0.000651232 -0.049193 0.00972259" quat="0.477798 0.572974 -0.518028 0.418398" mass="0.025" diaginertia="7.74531e-05 7.36783e-05 5.0886e-06"/>
+                      <joint name="robot1/gripper" pos="0 0 0" axis="0 0 1" type="slide" range="0 0.035" actuatorfrcrange="-10 10"/>
+                      <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="link7"/>
+                    </body>
+                    <body name="robot1/link8" pos="0 0 0.1358" quat="-2.59734e-06 -2.59735e-06 -0.707108 -0.707105">
+                      <inertial pos="0.000651232 -0.049193 0.00972259" quat="0.477798 0.572974 -0.518028 0.418398" mass="0.025" diaginertia="7.74531e-05 7.36783e-05 5.0886e-06"/>
+                      <joint name="robot1/gripper_sub" pos="0 0 0" axis="0 0 -1" type="slide" range="-0.035 0" actuatorfrcrange="-10 10"/>
+                      <geom type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="link8"/>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

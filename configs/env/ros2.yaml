@@ -1,0 +1,3 @@
+type: ros2
+name: ros2
+use_moveit_to_initialize: false

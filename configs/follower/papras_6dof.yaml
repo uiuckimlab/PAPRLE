@@ -1,0 +1,67 @@
+mesh_dir: 'models/' # Default directory for meshes
+robot_cfg:
+  name: papras_6dof
+  asset_cfg:
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/PAPRAS/papras_6dof/papras_6dof.urdf' # Path to the URDF file
+    xml_path: 'models/PAPRAS/papras_6dof/papras_6dof.xml' # If you have xml file, specify the path here or just use urdf file here as well
+
+  ignore_collision_pairs: []
+  control_dt: 0.008 # Control loop frequency - 125Hz for PAPRAS
+  teleop_dt: 0.02
+  eef_type: 'parallel_gripper' # Type of end effector: 'hand', 'power_gripper', 'parallel_gripper'
+  max_joint_vel: 20.0 # Maximum joint velocity
+
+  limb_joint_names:
+    robot1: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6']
+  hand_joint_names: # hand names
+    robot1: ['robot1/gripper']
+  end_effector_link: # for IK
+    robot1: 'robot1/end_effector_link'
+
+  init_qpos: [0.0, -1.0, 0.4220, 0.0, 1.0794, 0.0, 0.0]
+
+  viewer_args:
+    mujoco:
+      azimuth: 26.675000000000097
+      distance: 1.5335979275831788
+      elevation: -20.22500000000002
+      lookat: [ -0.20412881,  0.01636384,  0.28888699 ]
+      viewer_width: 1200
+      viewer_height: 800
+    isaacgym:
+      cam_pos: [1.41, -0.36, 0.58]
+      cam_target: [0.45, -0.23, 0.31]
+    trimesh:
+      pq: [1.51597506, 1.04149913, 0.88220541, 0.34222756, 0.24566453, 0.50989899, 0.75002151]
+
+ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
+  # the number of arms in the urdf file, the name of the robot does not matter, but order matters.
+  robot1:
+    # chain of joint names from base to end effector in ik_model
+    joint_names: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6']
+    ee_link: robot1/end_effector_link
+    dt: 0.05
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/PAPRAS/papras_6dof/papras_6dof.urdf'
+    ik_damping: 0.075
+    eps: 1e-3
+    base_link: robot1/link1 # base_link in the original urdf file,not the base_link in the ik model
+
+camera_cfg:
+  right:
+    serial_number: '218722271580'#'102422071302'
+    rgb_resolution: [848, 480]
+    depth_resolution: [848, 480]
+    get_aligned: true
+    depth_units: 9.999999747378752e-05
+    fps: 30
+  left:
+    serial_number: '130322272130'#'102422071302'
+    rgb_resolution: [480,270]
+    depth_resolution: [480,270]
+    get_aligned: true
+    depth_units: 9.999999747378752e-05
+    fps: 30
+
+

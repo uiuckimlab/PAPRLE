@@ -1,0 +1,71 @@
+mesh_dir: 'models/' # Default directory for meshes
+robot_cfg:
+  name: papras_7dof
+  asset_cfg:
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/PAPRAS/papras_7dof/papras_7dof.urdf' # Path to the URDF file
+    xml_path: 'models/PAPRAS/papras_7dof/papras_7dof.xml' # If you have xml file, specify the path here or just use urdf file here as well
+  ignore_collision_pairs: []
+  control_dt: 0.02 # Control loop frequency - if we are using joint trajectory controller, it is enough
+  eef_type: 'parallel_gripper' # Type of end effector: 'hand', 'power_gripper', 'parallel_gripper'
+  limb_joint_names:
+    robot1: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6','robot1/joint7']
+  hand_joint_names: # hand names
+    robot1: ['robot1/gripper']
+  max_joint_vel: 2.0 # Maximum joint velocity
+  end_effector_link:
+    robot1: 'robot1/end_effector_link'
+  init_qpos: [0.0, -1.057, 0.0, 0.485, 0.0, 1.125, 0.0, 0.0]
+  viewer_args:
+    mujoco:
+      azimuth: 52.325000000000145
+      distance: 1.5335979275831788
+      elevation: -12.125000000000004
+      lookat: [-0.20412881,  0.01636384,  0.28888699]
+    isaacgym:
+      cam_pos: [1.41, -0.36, 0.58]
+      cam_target: [0.45, -0.23, 0.31]
+ik_cfg: # information for inverse kinematics. Use single arm model for each arm.
+  # the number of arms in the urdf file, the name of the robot does not matter, but order matters.
+  robot1:
+    # chain of joint names from base to end effector in ik_model
+    joint_names: ['robot1/joint1', 'robot1/joint2', 'robot1/joint3', 'robot1/joint4', 'robot1/joint5', 'robot1/joint6', 'robot1/joint7']
+    ee_link: robot1/end_effector_link
+    dt: 0.1
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/PAPRAS/papras_7dof/papras_7dof.urdf'
+    ik_damping: 0.05
+    eps: 1e-2
+    base_link: robot1/link1 # base_link in the original urdf file,not the base_link in the ik model
+
+ros2_cfg:
+  lp_filter_alpha: 0.9
+  motion_planning: 'moveit' # moveit or interpolation
+  moveit:
+    namespace: ''
+    arm_group_name: 'arm'
+    hand_group_name: 'gripper'
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: True
+  state_sub_topic: '/joint_states' # Topic to subscribe for joint states
+  state_sub_msg_type: 'sensor_msgs/msg/JointState' # Message type for joint states
+  robots:
+    robot1:
+      arm_control_topic: '/arm1_controller/joint_trajectory'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/gripper1_controller/joint_trajectory'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+camera_cfg:
+  top:
+    serial_number: '238222073320'
+    rgb_resolution: [848, 480]
+    depth_resolution: [848, 480]
+    get_aligned: true
+    depth_units: 0.0001

@@ -1,0 +1,198 @@
+<mujoco model="papras_6dof_2arm_table">
+  <include file="../../assets/scene/floor_sky.xml" />
+  <compiler angle="radian" meshdir="../../"/>
+  <asset>
+    <mesh name="table" file="assets/scene/table.stl"/>
+    <mesh name="link1" file="assets/papras/link1.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link2" file="assets/papras/link2.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link3_papras_simple" file="assets/papras/link3_papras_simple.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link4_papras_simple" file="assets/papras/link4_papras_simple.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link5" file="assets/papras/link5.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link6_papras_simple" file="assets/papras/link6_papras_simple.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="end_link" file="assets/papras/end_link.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="rh_p12_rn_base" file="assets/robotis_hand_rh-p12-rn/rh_p12_rn_base.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="rh_p12_rn_r1" file="assets/robotis_hand_rh-p12-rn/rh_p12_rn_r1.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="rh_p12_rn_r2" file="assets/robotis_hand_rh-p12-rn/rh_p12_rn_r2.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="rh_p12_rn_l1" file="assets/robotis_hand_rh-p12-rn/rh_p12_rn_l1.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="rh_p12_rn_l2" file="assets/robotis_hand_rh-p12-rn/rh_p12_rn_l2.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="camera_mount_simple" file="assets/papras/camera_mount_simple.stl"/>
+  </asset>
+  <worldbody>
+    <body name="env">
+      <inertial pos="-0.00217819 0.0115131 4.82153e-05" quat="0.707114 -9.18314e-06 9.18295e-06 0.707099" mass="24.32" diaginertia="3.22235 2.59731 0.632618"/>
+      <geom type="mesh" rgba="0.501961 0.501961 0.501961 1" mesh="table"/>
+      <body name="robot3/link1" pos="-0.2599 0.50565 -0.05189" quat="0.000796327 0 0 1">
+        <inertial pos="0.00023 0 0.06223" mass="0.85644" diaginertia="1 1 1"/>
+        <geom type="mesh" mesh="link1"/>
+        <body name="robot3/link2" pos="0 0 0.126">
+          <inertial pos="0 0.0008 0.03183" mass="0.94658" diaginertia="1 1 1"/>
+          <joint name="robot3/joint1" pos="0 0 0" axis="0 0 1" range="-3.14159 3.14159" actuatorfrcrange="-100 100" damping="0.7"/>
+          <geom type="mesh" mesh="link2"/>
+          <body name="robot3/link3" pos="0 0.069 0.033">
+            <inertial pos="0.01768 -0.06881 0.20524" mass="1.3026" diaginertia="1 1 1"/>
+            <joint name="robot3/joint2" pos="0 0 0" axis="0 1 0" range="-2 2" actuatorfrcrange="-100 100" damping="0.7"/>
+            <geom pos="0.067 0.008 -0.019" quat="0.000796327 0 0 1" type="mesh" mesh="link3_papras_simple"/>
+            <body name="robot3/link4" pos="0.03 -0.0115 0.264">
+              <inertial pos="0.12475 -0.05716 0.02979" mass="1.15977" diaginertia="1 1 1"/>
+              <joint name="robot3/joint3" pos="0 0 0" axis="0 1 0" range="-3.14159 1.5708" actuatorfrcrange="-100 100" damping="0.7"/>
+              <geom pos="0.227 0.0085 -0.024" quat="0.000796327 0 0 1" type="mesh" mesh="link4_papras_simple"/>
+              <body name="robot3/link5" pos="0.195 -0.0575 0.03">
+                <inertial pos="0.05642 -0.00217 2e-05" mass="0.44688" diaginertia="1 1 1"/>
+                <joint name="robot3/joint4" pos="0 0 0" axis="1 0 0" range="-2.74889 2.74889" actuatorfrcrange="-100 100" damping="0.7"/>
+                <geom type="mesh" mesh="link5"/>
+                <body name="robot3/link6" pos="0.063 0.045 0">
+                  <inertial pos="0.06831 -0.04457 0" mass="0.43273" diaginertia="1 1 1"/>
+                  <joint name="robot3/joint5" pos="0 0 0" axis="0 1 0" range="-1.5708 1.5708" actuatorfrcrange="-100 100" damping="0.7"/>
+                  <geom pos="-0.034 -0.098 -0.028" type="mesh" mesh="link6_papras_simple"/>
+                  <body name="robot3/end_link" pos="0.123 -0.045 0">
+                    <inertial pos="0.00337 0 0" mass="0.01919" diaginertia="1 1 1"/>
+                    <joint name="robot3/joint6" pos="0 0 0" axis="1 0 0" range="-3.14159 3.14159" actuatorfrcrange="-100 100" damping="0.7"/>
+                    <geom type="mesh" mesh="end_link"/>
+                    <body name="robot3/gripper_main_link" pos="0.006 0 0" quat="0 0.707107 0 0.707107">
+                      <inertial pos="0 0 0.032" mass="0.236" diaginertia="1 1 1"/>
+                      <geom type="mesh" mesh="rh_p12_rn_base"/>
+                      <body name="robot3/gripper_link" pos="0 0.008 0.048">
+                        <inertial pos="0 0.034 0.004" mass="0.068" diaginertia="1 1 1"/>
+                        <joint name="robot3/gripper" pos="0 0 0" axis="1 0 0" range="0 1.1" actuatorfrcrange="-1000 1000" damping="0.7"/>
+                        <geom type="mesh" mesh="rh_p12_rn_r1"/>
+                        <body name="robot3/gripper_link_r2" pos="0 0.0493634 0.0285">
+                          <inertial pos="0 0.006 0.011" mass="0.022" diaginertia="1 1 1"/>
+                          <joint name="robot3/gripper_r2" pos="0 0 0" axis="-1 0 0" range="0 1" actuatorfrcrange="-1000 1000" damping="0.7"/>
+                          <geom type="mesh" mesh="rh_p12_rn_r2"/>
+                        </body>
+                      </body>
+                      <body name="robot3/gripper_link_l1" pos="0 -0.008 0.048">
+                        <inertial pos="0 -0.034 0.004" mass="0.068" diaginertia="1 1 1"/>
+                        <joint name="robot3/gripper_l1" pos="0 0 0" axis="-1 0 0" range="0 1.1" actuatorfrcrange="-1000 1000" damping="0.7"/>
+                        <geom type="mesh" mesh="rh_p12_rn_l1"/>
+                        <body name="robot3/gripper_link_l2" pos="0 -0.0493634 0.0285">
+                          <inertial pos="0 -0.006 0.011" mass="0.022" diaginertia="1 1 1"/>
+                          <joint name="robot3/gripper_l2" pos="0 0 0" axis="1 0 0" range="0 1" actuatorfrcrange="-1000 1000" damping="0.7"/>
+                          <geom type="mesh" mesh="rh_p12_rn_l2"/>
+                        </body>
+                      </body>
+                      <body name="robot3/end_effector_link" pos="0 0 0.135" quat="0 0.707107 0 0.707107">
+                        <inertial pos="0 0 0" mass="0.001" diaginertia="1 1 1"/>
+                      </body>
+                      <body name="robot3/camera_mount" pos="0.04452 -0.0167 0.049" quat="0.707107 0 0 0.707107">
+                        <inertial pos="0 0 0" mass="0.088" diaginertia="1 1 1"/>
+                        <geom quat="0.5 0.5 -0.5 0.5" type="mesh" mesh="camera_mount_simple"/>
+                        <body name="robot3/camera_link" pos="-0.015 0 0">
+                          <body name="robot3/camera_plugin_link" quat="0.5 0.5 -0.5 0.5"/>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="robot4/link1" pos="-0.2599 -0.50535 -0.05189" quat="0.000796327 0 0 1">
+        <inertial pos="0.00023 0 0.06223" mass="0.85644" diaginertia="1 1 1"/>
+        <geom type="mesh" mesh="link1"/>
+        <body name="robot4/link2" pos="0 0 0.126">
+          <inertial pos="0 0.0008 0.03183" mass="0.94658" diaginertia="1 1 1"/>
+          <joint name="robot4/joint1" pos="0 0 0" axis="0 0 1" range="-3.14159 3.14159" actuatorfrcrange="-100 100" damping="0.7"/>
+          <geom type="mesh" mesh="link2"/>
+          <body name="robot4/link3" pos="0 0.069 0.033">
+            <inertial pos="0.01768 -0.06881 0.20524" mass="1.3026" diaginertia="1 1 1"/>
+            <joint name="robot4/joint2" pos="0 0 0" axis="0 1 0" range="-2 2" actuatorfrcrange="-100 100" damping="0.7"/>
+            <geom pos="0.067 0.008 -0.019" quat="0.000796327 0 0 1" type="mesh" mesh="link3_papras_simple"/>
+            <body name="robot4/link4" pos="0.03 -0.0115 0.264">
+              <inertial pos="0.12475 -0.05716 0.02979" mass="1.15977" diaginertia="1 1 1"/>
+              <joint name="robot4/joint3" pos="0 0 0" axis="0 1 0" range="-3.14159 1.5708" actuatorfrcrange="-100 100" damping="0.7"/>
+              <geom pos="0.227 0.0085 -0.024" quat="0.000796327 0 0 1" type="mesh" mesh="link4_papras_simple"/>
+              <body name="robot4/link5" pos="0.195 -0.0575 0.03">
+                <inertial pos="0.05642 -0.00217 2e-05" mass="0.44688" diaginertia="1 1 1"/>
+                <joint name="robot4/joint4" pos="0 0 0" axis="1 0 0" range="-2.74889 2.74889" actuatorfrcrange="-100 100" damping="0.7"/>
+                <geom type="mesh" mesh="link5"/>
+                <body name="robot4/link6" pos="0.063 0.045 0">
+                  <inertial pos="0.06831 -0.04457 0" mass="0.43273" diaginertia="1 1 1"/>
+                  <joint name="robot4/joint5" pos="0 0 0" axis="0 1 0" range="-1.5708 1.5708" actuatorfrcrange="-100 100" damping="0.7"/>
+                  <geom pos="-0.034 -0.098 -0.028" type="mesh" mesh="link6_papras_simple"/>
+                  <body name="robot4/end_link" pos="0.123 -0.045 0">
+                    <inertial pos="0.00337 0 0" mass="0.01919" diaginertia="1 1 1"/>
+                    <joint name="robot4/joint6" pos="0 0 0" axis="1 0 0" range="-3.14159 3.14159" actuatorfrcrange="-100 100" damping="0.7"/>
+                    <geom type="mesh" mesh="end_link"/>
+                    <body name="robot4/gripper_main_link" pos="0.006 0 0" quat="0 0.707107 0 0.707107">
+                      <inertial pos="0 0 0.032" mass="0.236" diaginertia="1 1 1"/>
+                      <geom type="mesh" mesh="rh_p12_rn_base"/>
+                      <body name="robot4/gripper_link" pos="0 0.008 0.048">
+                        <inertial pos="0 0.034 0.004" mass="0.068" diaginertia="1 1 1"/>
+                        <joint name="robot4/gripper" pos="0 0 0" axis="1 0 0" range="0 1.1" actuatorfrcrange="-1000 1000" damping="0.7"/>
+                        <geom type="mesh" mesh="rh_p12_rn_r1"/>
+                        <body name="robot4/gripper_link_r2" pos="0 0.0493634 0.0285">
+                          <inertial pos="0 0.006 0.011" mass="0.022" diaginertia="1 1 1"/>
+                          <joint name="robot4/gripper_r2" pos="0 0 0" axis="-1 0 0" range="0 1" actuatorfrcrange="-1000 1000" damping="0.7"/>
+                          <geom type="mesh" mesh="rh_p12_rn_r2"/>
+                        </body>
+                      </body>
+                      <body name="robot4/gripper_link_l1" pos="0 -0.008 0.048">
+                        <inertial pos="0 -0.034 0.004" mass="0.068" diaginertia="1 1 1"/>
+                        <joint name="robot4/gripper_l1" pos="0 0 0" axis="-1 0 0" range="0 1.1" actuatorfrcrange="-1000 1000" damping="0.7"/>
+                        <geom type="mesh" mesh="rh_p12_rn_l1"/>
+                        <body name="robot4/gripper_link_l2" pos="0 -0.0493634 0.0285">
+                          <inertial pos="0 -0.006 0.011" mass="0.022" diaginertia="1 1 1"/>
+                          <joint name="robot4/gripper_l2" pos="0 0 0" axis="1 0 0" range="0 1" actuatorfrcrange="-1000 1000" damping="0.7"/>
+                          <geom type="mesh" mesh="rh_p12_rn_l2"/>
+                        </body>
+                      </body>
+                      <body name="robot4/end_effector_link" pos="0 0 0.135" quat="0 0.707107 0 0.707107">
+                        <inertial pos="0 0 0" mass="0.001" diaginertia="1 1 1"/>
+                      </body>
+                      <body name="robot4/camera_mount" pos="0.04452 -0.0167 0.049" quat="0.707107 0 0 0.707107">
+                        <inertial pos="0 0 0" mass="0.088" diaginertia="1 1 1"/>
+                        <geom quat="0.5 0.5 -0.5 0.5" type="mesh" mesh="camera_mount_simple"/>
+                        <body name="robot4/camera_link" pos="-0.015 0 0">
+                          <body name="robot4/camera_plugin_link" quat="0.5 0.5 -0.5 0.5"/>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+    <actuator>
+    <!-- Arm joints -->
+    <motor name="robot3/joint1" joint="robot3/joint1" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot3/joint2" joint="robot3/joint2" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot3/joint3" joint="robot3/joint3" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot3/joint4" joint="robot3/joint4" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot3/joint5" joint="robot3/joint5" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot3/joint6" joint="robot3/joint6" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+
+    <motor name="robot4/joint1" joint="robot4/joint1" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot4/joint2" joint="robot4/joint2" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot4/joint3" joint="robot4/joint3" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot4/joint4" joint="robot4/joint4" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot4/joint5" joint="robot4/joint5" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <motor name="robot4/joint6" joint="robot4/joint6" ctrllimited="true" ctrlrange="-100 100" gear="1"/>
+    <!-- Gripper joints -->
+    <motor name="robot3/gripper" joint="robot3/gripper" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+    <motor name="robot3/gripper_r2" joint="robot3/gripper_r2" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+    <motor name="robot3/gripper_l1" joint="robot3/gripper_l1" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+    <motor name="robot3/gripper_l2" joint="robot3/gripper_l2" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+
+    <motor name="robot4/gripper" joint="robot4/gripper" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+    <motor name="robot4/gripper_r2" joint="robot4/gripper_r2" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+    <motor name="robot4/gripper_l1" joint="robot4/gripper_l1" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+    <motor name="robot4/gripper_l2" joint="robot4/gripper_l2" ctrllimited="true" ctrlrange="-1000 1000" gear="1"/>
+  </actuator>
+  <contact>
+    <exclude body1="robot3/link1" body2="robot3/link2" />
+    <exclude body1="robot4/link1" body2="robot4/link2" />
+    <exclude body1="robot3/gripper_link_r2" body2="robot3/gripper_link_l2" />
+    <exclude body1="robot4/gripper_link_r2" body2="robot4/gripper_link_l2" />
+  </contact>
+
+
+
+</mujoco>

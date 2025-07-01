@@ -1,0 +1,159 @@
+mesh_dir: 'models/' # Default directory for meshes
+robot_cfg:
+  name: g1
+  asset_cfg:
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/humanoids/unitree_g1/g1_29dof.urdf' # Path to the URDF file
+    xml_path: 'models/humanoids/unitree_g1/g1_29dof.xml' # If you have xml file, specify the path here or just use urdf file here as well
+  ignore_collision_pairs: [] # List of collision pairs to ignore, use * for partial match
+  teleop_dt: 0.02
+  control_dt: 0.002 # Control loop frequency - 125Hz for PAPRAS
+  eef_type: null # Type of end effector: 'hand', 'power_gripper', 'parallel_gripper'
+  num_eefs: 4 # number of limbs (end effectors) - 1 for single arm, 2 for dual arm...
+  limb_joint_names:
+    left_leg:
+      - 'left_hip_pitch_joint'
+      - 'left_hip_roll_joint'
+      - 'left_hip_yaw_joint'
+      - 'left_knee_joint'
+#      - 'left_ankle_pitch_joint'
+#      - 'left_ankle_roll_joint'
+    right_leg:
+      - 'right_hip_pitch_joint'
+      - 'right_hip_roll_joint'
+      - 'right_hip_yaw_joint'
+      - 'right_knee_joint'
+#      - 'right_ankle_pitch_joint'
+#      - 'right_ankle_roll_joint'
+    left_arm:
+      - 'left_shoulder_pitch_joint'
+      - 'left_shoulder_roll_joint'
+      - 'left_shoulder_yaw_joint'
+      - 'left_elbow_joint'
+      - 'left_wrist_roll_joint'
+      - 'left_wrist_pitch_joint'
+      - 'left_wrist_yaw_joint'
+    right_arm:
+      - 'right_shoulder_pitch_joint'
+      - 'right_shoulder_roll_joint'
+      - 'right_shoulder_yaw_joint'
+      - 'right_elbow_joint'
+      - 'right_wrist_roll_joint'
+      - 'right_wrist_pitch_joint'
+      - 'right_wrist_yaw_joint'
+  hand_joint_names:  # No hand for this robot
+    left_leg: []
+    right_leg: []
+    left_arm: []
+    right_arm: []
+  max_joint_vel: 20.0 # Maximum joint velocity
+  world_link: 'pelvis'
+  end_effector_link:
+    left_leg: left_ankle_roll_link
+    right_leg: right_ankle_roll_link
+    left_arm: left_rubber_hand
+    right_arm: right_rubber_hand
+  named_poses:
+    #TODO: maybe read this info from srdf file, but conditionally. If not found, use this info
+    init: [0,0,0,0,
+           0,0,0,0,
+           0,0,0,0,0,0,0,
+           0,0,0,0,0,0,0]
+  viewer_args:
+    mujoco:
+      azimuth: 172.7000000000001
+      distance: 2.6093796441399872
+      elevation: -28.550000000000004
+      lookat: [-0.21228273,  0.03259374, -0.11615278]
+    isaacgym:
+      cam_pos: [1.20, -0.27, 1.39]
+      cam_target: [0.24, -0.14, 1.12]
+ik_cfg: # information for inverse kinematics. Use single limb model for each limb.
+  # the number of arms in the urdf file, the name of the robot does not matter, but order matters.
+  left_leg:
+    # chain of joint names from base to end effector
+    joint_names: ['left_hip_pitch_joint', 'left_hip_roll_joint', 'left_hip_yaw_joint', 'left_knee_joint']
+    ee_link: left_ankle_roll_link
+    dt: 0.05
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/humanoids/unitree_g1/g1_29dof.urdf'
+    ik_damping: 0.1
+    eps: 1e-3
+    base_link: left_hip_pitch_link # base_link in the original urdf file,not the base_link in the ik model
+
+  right_leg:
+    joint_names: ['right_hip_pitch_joint', 'right_hip_roll_joint', 'right_hip_yaw_joint', 'right_knee_joint']
+    ee_link: right_ankle_roll_link
+    dt: 0.05
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/humanoids/unitree_g1/g1_29dof.urdf'
+    ik_damping: 0.1
+    eps: 1e-3
+    base_link: right_hip_pitch_link # base_link in the original urdf file,not the base_link in the ik model
+
+  left_arm:
+    # chain of joint names from base to end effector
+    joint_names: ['left_shoulder_pitch_joint', 'left_shoulder_roll_joint', 'left_shoulder_yaw_joint', 'left_elbow_joint', 'left_wrist_roll_joint','left_wrist_pitch_joint', 'left_wrist_yaw_joint']
+    ee_link: left_rubber_hand
+    dt: 0.05
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/humanoids/unitree_g1/g1_29dof.urdf'
+    ik_damping: 0.1
+    eps: 1e-3
+    base_link: left_shoulder_pitch_link # base_link in the original urdf file,not the base_link in the ik model
+
+  right_arm:
+    # chain of joint names from base to end effector
+    joint_names: ['right_shoulder_pitch_joint', 'right_shoulder_roll_joint', 'right_shoulder_yaw_joint', 'right_elbow_joint', 'right_wrist_roll_joint','right_wrist_pitch_joint', 'right_wrist_yaw_joint']
+    ee_link: right_rubber_hand
+    dt: 0.05
+    asset_dir: ${mesh_dir} # Directory for assets
+    urdf_path: 'models/humanoids/unitree_g1/g1_29dof.urdf'
+    ik_damping: 0.1
+    eps: 1e-3
+    base_link: right_shoulder_pitch_link # base_link in the original urdf file,not the base_link in the ik model
+
+ros2_cfg:
+  lp_filter_alpha: 0.8
+  motion_planning: 'interpolation' # moveit or interpolation
+  moveit: null
+  state_sub_topic: '/lowstate' # Topic to subscribe for joint states
+  state_sub_msg_type: 'LowState' # Message type for joint states
+  robots:
+    left_arm:
+      arm_control_topic: '/lowcmd'
+      arm_control_msg_type: 'LowCmd'
+      hand_control_topic: ''
+      hand_control_msg_type: ''
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+    right_arm:
+      arm_control_topic: '/lowcmd'
+      arm_control_msg_type: 'LowCmd'
+      hand_control_topic: ''
+      hand_control_msg_type: ''
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+    left_leg:
+      arm_control_topic: '/lowcmd'
+      arm_control_msg_type: 'LowCmd'
+      hand_control_topic: ''
+      hand_control_msg_type: ''
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+    right_leg:
+      arm_control_topic: '/lowcmd'
+      arm_control_msg_type: 'LowCmd'
+      hand_control_topic: ''
+      hand_control_msg_type: ''
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+camera_cfg: null
