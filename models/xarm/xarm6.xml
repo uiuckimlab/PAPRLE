@@ -142,3 +142,4 @@
       <exclude body1="link_eef" body2="xarm_gripper_base_link" />
   </contact>
 </mujoco>
+:
