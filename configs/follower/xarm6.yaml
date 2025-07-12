@@ -1,0 +1,144 @@
+mesh_dir: models/
+robot_cfg:
+  name: xarm6
+  asset_cfg:
+    asset_dir: ${mesh_dir}
+    urdf_path: models/xarm/xarm6.urdf
+    xml_path: models/xarm/xarm6.xml
+  ignore_collision_pairs: []
+  control_dt: 0.02
+  eef_type: parallel_gripper
+  limb_joint_names:
+    arm:
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+    - joint5
+    - joint6
+  hand_joint_names:
+    arm:
+    - drive_joint
+  max_joint_vel: 2.0
+  end_effector_link:
+    arm: link_eef_paprle
+  init_qpos:
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - -1.57
+  - 0.0
+  - 0.0
+  viewer_args:
+    mujoco:
+      azimuth: 172.7000000000001
+      distance: 2.6093796441399872
+      elevation: -28.550000000000004
+      lookat:
+      - -0.21228273
+      - 0.03259374
+      - -0.11615278
+    isaacgym:
+      cam_pos:
+      - 1.41
+      - -0.36
+      - 0.58
+      cam_target:
+      - 0.45
+      - -0.23
+      - 0.31
+    trimesh:
+      pq:
+      - 1.6723996641513676
+      - -0.7507286806222732
+      - 0.8682281906897257
+      - 0.687230565118163
+      - 0.4897546511147104
+      - 0.2564309495761239
+      - 0.4712724267113097
+  hand_limits:
+    arm:
+    - - 0.0
+      - 0.85
+ik_cfg:
+  arm:
+    urdf_path: models/xarm/xarm7.urdf
+    joint_names:
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+    - joint5
+    - joint6
+    ee_link: link_eef_paprle
+    base_link: world
+    dt: 0.05
+    asset_dir: ${mesh_dir}
+    ik_damping: 0.075
+    eps: 0.001
+ros1_cfg:
+  lp_filter_alpha: 0.9
+  motion_planning: moveit
+  moveit:
+    namespace: /followers
+    arm_group_name: 'xarm6'
+    hand_group_name: 'xarm_gripper'
+    init_pose_name: 'hold-up'
+    rest_pose_name: 'home'
+    hand_init_pose_name: 'open'
+    hand_rest_pose_name: 'open'
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: true
+  state_sub_topic: /followers/joint_states
+  state_sub_msg_type: sensor_msgs/msg/JointState
+  robots:
+    arm:
+      arm_control_topic: '/xarm7_traj_controller/joint_trajectory'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/xarm_gripper_traj_controller/joint_trajectory'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+ros2_cfg:
+  lp_filter_alpha: 0.8
+  motion_planning: moveit
+  moveit:
+    namespace: followers
+    arm_group_name: 'xarm6'
+    hand_group_name: 'xarm_gripper'
+    init_pose_name: 'hold-up'
+    rest_pose_name: 'home'
+    hand_init_pose_name: 'open'
+    hand_rest_pose_name: 'open'
+    num_planning_attempts: 30
+    planning_time: 20.0
+    max_velocity_scaling_factor: 0.1
+    max_acceleration_scaling_factor: 0.1
+    use_move_group_action: true
+  state_sub_topic: /joint_states
+  state_sub_msg_type: sensor_msgs/msg/JointState
+  robots:
+    arm:
+      arm_control_topic: '/xarm6_traj_controller/joint_trajectory'
+      arm_control_msg_type: 'JointTrajectory'
+      hand_control_topic: '/xarm_gripper_traj_controller/joint_trajectory'
+      hand_control_msg_type: 'JointTrajectory'
+      arm_state_sub_topic: ${...state_sub_topic}
+      hand_state_sub_topic: ${...state_sub_topic}
+      arm_state_sub_msg_type: ${...state_sub_msg_type}
+      hand_state_sub_msg_type: ${...state_sub_msg_type}
+# camera_cfg: null # when no camera is used, set camera_cfg to null
+camera_cfg:
+  top:
+    serial_number: '238222073320'
+    rgb_resolution: [848, 480]
+    depth_resolution: [848, 480]
+    get_aligned: true
+    depth_units: 0.00025 # this will be overwritten by the camera reader
+

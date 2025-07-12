@@ -15,6 +15,7 @@ import logging
 from paprle.envs.base_env import BaseEnv
 import xml.etree.ElementTree as ET
 from paprle.envs.ros_env_utils.subscribe_and_publish import JointStateSubscriber, ControllerPublisher
+from paprle.visualizer.vis_utils import append_text_to_image
 def lp_filter(new_value, prev_value, alpha=0.5):
     if prev_value is None: return new_value
     if not isinstance(prev_value, np.ndarray): prev_value = np.array(prev_value)
@@ -39,14 +40,14 @@ class ROSEnv(BaseEnv):
             print("rclpy already initialized")
 
 
-        self.motion_planning_method = robot.ros2_config.motion_planning
+        self.motion_planning_method = robot.ros1_config.motion_planning
         if self.motion_planning_method == 'moveit':
-            self.moveit_config = robot.ros2_config.moveit
+            self.moveit_config = robot.ros1_config.moveit
             self.setup_moveit()
 
         # Setup Subscribers and Publishers
         topics_to_sub, topics_to_pub = {}, {}
-        for limb_name, limb_info in robot.ros2_config.robots.items():
+        for limb_name, limb_info in robot.ros1_config.robots.items():
             arm_state_sub_topic = limb_info['arm_state_sub_topic']
             joint_names = robot.robot_config.limb_joint_names[limb_name]
             if arm_state_sub_topic not in topics_to_sub:
@@ -70,7 +71,7 @@ class ROSEnv(BaseEnv):
             topics_to_pub[hand_control_pub_topic]['joint_names'].extend(hand_joint_names)
 
         if robot.name == 'g1':
-            from paprle.envs.ros2_env_utils.g1_subscribe_and_publish import \
+            from paprle.envs.ros1_env_utils.g1_subscribe_and_publish import \
                 JointStateSubscriber as G1JointStateSubscriber
             self.state_subscriber = G1JointStateSubscriber(topics_to_sub, robot.joint_names)
         else:
@@ -85,15 +86,29 @@ class ROSEnv(BaseEnv):
             iter += 1
 
         self.command_lock = Lock()
-        self.last_command, self.lp_filter_alpha = None, self.robot.ros2_config.lp_filter_alpha
+        self.last_command, self.lp_filter_alpha = None, self.robot.ros1_config.lp_filter_alpha
         self.last_vel, self.dt = None, self.robot.control_dt
         if robot.name == 'g1':
-            from paprle.envs.ros2_env_utils.g1_subscribe_and_publish import ControllerPublisher as G1ControllerPublisher
+            from paprle.envs.ros1_env_utils.g1_subscribe_and_publish import ControllerPublisher as G1ControllerPublisher
             self.controller_publisher = G1ControllerPublisher(topics_to_pub, robot.joint_names,
                                                               self.state_subscriber.states)
         else:
             self.controller_publisher = ControllerPublisher(topics_to_pub, robot.joint_names,
                                                             self.state_subscriber.states)
+
+        # Initialize camera reader if available
+        self.camera_reader = None
+        if robot.camera_config is not None:
+            from paprle.camera.realsense_reader import RealSenseReader
+            self.camera_reader = RealSenseReader(robot.camera_config)
+            print("[Env] Camera reader started")
+
+        self.render_mode = render_mode
+        self.view_im = None
+        self.shutdown = False
+        if self.render_mode:
+            self.render_thread = Thread(target=self.render)
+            self.render_thread.start()
 
     def setup_moveit(self):
         self.moveit_extract_joint_info()
@@ -115,6 +130,12 @@ class ROSEnv(BaseEnv):
         if self.moveit_config.hand_group_name != '':
             self.hands_group.set_max_velocity_scaling_factor(self.moveit_config.max_velocity_scaling_factor)
             self.hands_group.set_max_acceleration_scaling_factor(self.moveit_config.max_acceleration_scaling_factor)
+
+        self.moveit_init_pose_name = getattr(self.robot.ros1_config.moveit, 'init_pose_name', 'init')
+        self.moveit_rest_pose_name = getattr(self.robot.ros1_config.moveit, 'rest_pose_name', 'rest')
+        self.hand_moveit_init_pose_name = getattr(self.robot.ros1_config.moveit, 'hand_init_pose_name', self.moveit_init_pose_name)
+        self.hand_moveit_rest_pose_name = getattr(self.robot.ros1_config.moveit, 'hand_rest_pose_name', self.moveit_init_pose_name)
+
 
     def moveit_extract_joint_info(self):
         semantic_description = rospy.get_param(f'{self.moveit_config.namespace}/robot_description_semantic')
@@ -161,7 +182,7 @@ class ROSEnv(BaseEnv):
             self.arms_group.clear_pose_targets()
 
             if self.moveit_config.hand_group_name != '':
-                self.hands_group.set_named_target("init")
+                self.hands_group.set_named_target(self.hand_moveit_init_pose_name)
                 self.hands_group.go(wait=True)
                 self.hands_group.stop()
                 self.hands_group.clear_pose_targets()
@@ -225,18 +246,14 @@ class ROSEnv(BaseEnv):
                 self.controller_publisher.command_vel = None
                 self.controller_publisher.command_acc = None
 
-            self.arms_group.set_named_target("init")
+            self.arms_group.set_named_target(self.moveit_init_pose_name)
             self.arms_group.go(wait=True)
             self.arms_group.stop()
             self.arms_group.clear_pose_targets()
 
             # TODO: Find some general way to initialize the hand group
             if self.moveit_config.hand_group_name != '':
-                # open with moveit
-                try:
-                    self.hands_group.set_named_target("init")
-                except:
-                    self.hands_group.set_named_target("open")
+                self.hands_group.set_named_target(self.hand_moveit_init_pose_name)
                 self.hands_group.go(wait=True)
                 self.hands_group.stop()
                 self.hands_group.clear_pose_targets()
@@ -292,3 +309,28 @@ class ROSEnv(BaseEnv):
         obs_dict['qeff'] = np.array(self.state_subscriber.states['eff'].copy())
 
         return obs_dict
+
+    def render(self):
+        pad_width = 10
+        view_im = None
+        color_dict = {'blue': (0, 0, 255), 'green': (0, 255, 0), 'red': (255, 0, 0)}
+        while not self.shutdown:
+            if self.camera_reader is not None:
+                view_im = self.camera_reader.render()
+            else:
+                view_im = np.zeros((480, 640, 3), dtype=np.uint8)
+                view_im = cv2.putText(view_im, 'No camera available', (10, 240), cv2.FONT_HERSHEY_SIMPLEX, 1,(255, 255, 255), 2, cv2.LINE_AA)
+
+            str_color = (255, 255, 255)
+            for node_name, node_info in self.vis_info.items():
+                str_color = node_info['color']
+                if isinstance(str_color, str):
+                    str_color = color_dict[str_color]
+                view_im = append_text_to_image(view_im, node_info['log'], font_color=(0,0,0))
+            self.view_im = cv2.copyMakeBorder(view_im, pad_width, pad_width, pad_width, pad_width, cv2.BORDER_CONSTANT, value=str_color)
+
+            if self.render_mode and self.view_im is not None:
+                cv2.imshow('ENV', self.view_im[..., ::-1])
+                k = cv2.waitKey(1)
+            time.sleep(0.01)
+        return

@@ -45,6 +45,9 @@ class Sliders:
         self.last_qpos = robot.init_qpos
         self.output_type = leader_config.output_type
 
+        self.leader_viz_info = {}
+        self.leader_viz_info['color'] = 'green'
+        self.leader_viz_info['log'] = 'Sliders initialized successfully!'
         return
 
     def __render(self):
@@ -74,6 +77,8 @@ class Sliders:
 
     def reset(self, ):
         self.require_end = True
+        self.leader_viz_info['color'] = 'red'
+        self.leader_viz_info['log'] = 'End signal detected! Resetting the leader and follower!'
         return
 
     def launch_init(self, init_env_qpos):
@@ -81,6 +86,8 @@ class Sliders:
         self.last_qpos[:] = init_env_qpos
         self.is_ready = True
         self.require_end = False
+        self.leader_viz_info['color'] = 'green'
+        self.leader_viz_info['log'] = 'Sliders initialized successfully!'
         return
 
     def initialize(self, init_env_qpos):
@@ -93,6 +100,9 @@ class Sliders:
         return
 
     def get_status(self):
+        self.leader_viz_info['color'] = 'green'
+        self.leader_viz_info['log'] = 'Running...'
+
         self.sliders.update()
         q_from_sliders = self.sliders.get_slider_values()
         self.last_qpos = q_from_sliders
@@ -106,6 +116,8 @@ class Sliders:
             return q_from_sliders
 
     def update_vis_info(self, env_vis_info):
+        if env_vis_info is not None:
+            env_vis_info['leader'] = self.leader_viz_info
         return env_vis_info
 
     def close(self):

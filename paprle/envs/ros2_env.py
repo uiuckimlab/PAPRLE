@@ -197,7 +197,16 @@ class ROS2Env(BaseEnv):
         self.arms_group.allowed_planning_time = self.moveit_config.planning_time
         self.arms_group.max_velocity = self.moveit_config.max_velocity_scaling_factor
 
-        self.arms_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.arm_group_name]['init'])
+        self.moveit_init_pose_name = getattr(self.robot.ros2_config.moveit, 'init_pose_name', 'init')
+        self.moveit_rest_pose_name = getattr(self.robot.ros2_config.moveit, 'rest_pose_name', 'rest')
+        if self.moveit_init_pose_name not in self.moveit_group_poses[self.moveit_config.arm_group_name]:
+            raise ValueError(f"MoveIt init pose '{self.moveit_init_pose_name}' not found in group '{self.moveit_config.arm_group_name}' \n Please check your follower moveit config.")
+        if self.moveit_rest_pose_name not in self.moveit_group_poses[self.moveit_config.arm_group_name]:
+            raise ValueError(f"MoveIt rest pose '{self.moveit_rest_pose_name}' not found in group '{self.moveit_config.arm_group_name}' \n Please check your follower moveit config.")
+        self.hand_moveit_init_pose_name = getattr(self.robot.ros2_config.moveit, 'hand_init_pose_name', self.moveit_init_pose_name)
+        self.hand_moveit_rest_pose_name = getattr(self.robot.ros2_config.moveit, 'hand_rest_pose_name', self.moveit_init_pose_name)
+
+        self.arms_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.arm_group_name][self.moveit_init_pose_name])
         self.arms_group.wait_until_executed()
 
         if self.moveit_hand_joint_names:
@@ -207,7 +216,7 @@ class ROS2Env(BaseEnv):
             self.hand_group.num_planning_attempts = self.moveit_config.num_planning_attempts
             self.hand_group.allowed_planning_time = self.moveit_config.planning_time
             self.hand_group.max_velocity = self.moveit_config.max_velocity_scaling_factor
-            self.hand_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.hand_group_name]['init'])
+            self.hand_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.hand_group_name][self.hand_moveit_init_pose_name])
             self.hand_group.wait_until_executed()
         return
 
@@ -256,10 +265,10 @@ class ROS2Env(BaseEnv):
         return
 
     def rest_position(self):
-        self.arms_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.arm_group_name]['rest'])
+        self.arms_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.arm_group_name][self.moveit_rest_pose_name])
         self.arms_group.wait_until_executed()
         if self.moveit_hand_joint_names:
-            self.hand_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.hand_group_name]['init'])
+            self.hand_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.hand_group_name][self.hand_moveit_init_pose_name])
             self.hand_group.wait_until_executed()
         return
 
@@ -272,12 +281,13 @@ class ROS2Env(BaseEnv):
                 self.controller_publisher.command_vel = None
                 self.controller_publisher.command_acc = None
 
-            self.arms_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.arm_group_name]['init'])
+            self.arms_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.arm_group_name][self.moveit_init_pose_name])
             self.arms_group.wait_until_executed()
 
             if self.moveit_hand_joint_names:
-                self.hand_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.hand_group_name]['init'])
+                self.hand_group.move_to_configuration(self.moveit_group_poses[self.moveit_config.hand_group_name][self.hand_moveit_init_pose_name])
                 self.hand_group.wait_until_executed()
+
         else:
             # else, we will just interpolate the poses to the init pose, so we don't need to clear the target qpos
             # actually, considering g1, it is not good to clear the target qpos, because it will make g1 to damping mode - dangerous!
@@ -321,6 +331,8 @@ class ROS2Env(BaseEnv):
 
     def get_observation(self):
         obs_dict = {}
+        if self.camera_reader is not None:
+            obs_dict['camera'] = self.camera_reader.get_status()
         obs_dict['qpos'] = np.array(self.state_subscriber.states['pos'].copy())
         obs_dict['qvel'] = np.array(self.state_subscriber.states['vel'].copy())
         obs_dict['qeff'] = np.array(self.state_subscriber.states['eff'].copy())

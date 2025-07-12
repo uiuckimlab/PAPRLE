@@ -137,6 +137,10 @@ class SimPuppeteer:
         self.follower_max_vals = np.array(self.follower_max_vals)
         if self.exclude_hand_joints:
             self.include_joints = [i for i in range(len(self.leader_robot.joint_names)) if i not in self.exclude_hand_joints]
+
+        self.leader_viz_info = {}
+        self.leader_viz_info['color'] = 'green'
+        self.leader_viz_info['log'] = 'Sim Puppeteer initialized successfully!'
         return
 
     def load_pin_model(self, urdf_path, asset_dir, end_effector_link_dict, ):
@@ -197,6 +201,8 @@ class SimPuppeteer:
 
     def reset(self, ):
         self.require_end = True
+        self.leader_viz_info['color'] = 'red'
+        self.leader_viz_info['log'] = 'End signal detected! Resetting the leader and follower!'
         return
 
     def launch_init(self, init_env_qpos):
@@ -204,6 +210,8 @@ class SimPuppeteer:
 
         self.is_ready = True
         self.require_end = False
+        self.leader_viz_info['color'] = 'green'
+        self.leader_viz_info['log'] = 'SimPuppeteers initialized successfully!'
         return
 
     def initialize(self, init_env_qpos):
@@ -270,6 +278,8 @@ class SimPuppeteer:
             return q_from_sliders
 
     def update_vis_info(self, env_vis_info):
+        if env_vis_info is not None:
+            env_vis_info['leader'] = self.leader_viz_info
         return env_vis_info
 
     def close(self):
